@@ -64,22 +64,28 @@ export default function Navbar({
               Destinations
             </Link>
             <Link
-              href="/#comment-ca-marche"
+              href="/how-it-works"
               className="text-sm font-semibold hover:text-primary transition-colors"
             >
               Comment ça marche
             </Link>
-            <Link
+            <a
               href="/#publications"
               className="text-sm font-semibold hover:text-primary transition-colors"
             >
               Projets Éco
-            </Link>
-            <Link
+            </a>
+            <a
               href="/#a-propos"
               className="text-sm font-semibold hover:text-primary transition-colors"
             >
               À propos
+            </a>
+            <Link
+              href="/dashboard/afratim"
+              className="text-sm font-semibold hover:text-emerald-600 transition-colors"
+            >
+              AFRATIM ODD
             </Link>
           </nav>
         )}
