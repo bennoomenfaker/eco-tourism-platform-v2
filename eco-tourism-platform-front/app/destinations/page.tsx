@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -787,6 +787,19 @@ export default function DestinationsPage({ interne = false }: { interne?: boolea
     const q = params.get("q");
     if (q) setSearch(q);
   }, []);
+
+  // La recherche est reflétée dans l'URL (?q=) comme depuis l'accueil :
+  // le lien devient partageable et un rechargement conserve le résultat.
+  // Le premier passage est ignoré : l'URL initiale fait déjà foi (?q=…).
+  const searchSyncReady = useRef(false);
+  useEffect(() => {
+    if (!searchSyncReady.current) { searchSyncReady.current = true; return; }
+    const params = new URLSearchParams(window.location.search);
+    if (search) params.set("q", search);
+    else params.delete("q");
+    const qs = params.toString();
+    router.replace(`${window.location.pathname}${qs ? `?${qs}` : ""}`, { scroll: false });
+  }, [search, router]);
   const [minPrice, setMinPrice] = useState<number | "">("");
   const [maxPrice, setMaxPrice] = useState<number | "">("");
   const [regionSearch, setRegionSearch] = useState("");
@@ -1082,7 +1095,7 @@ export default function DestinationsPage({ interne = false }: { interne?: boolea
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-6 gap-4">
               <p className="text-sm font-semibold text-slate-500 shrink-0">
-                {loading ? "Chargement…" : contentType === "circuits" ? `${filteredCircuits.length} circuit${filteredCircuits.length !== 1 ? "s" : ""} trouvé${filteredCircuits.length !== 1 ? "s" : ""}` : `${filtered.length} offre${filtered.length !== 1 ? "s" : ""} trouvée${filtered.length !== 1 ? "s" : ""}`}
+                {loading ? "Chargement…" : contentType === "circuits" ? `${filteredCircuits.length} circuit${filteredCircuits.length !== 1 ? "s" : ""} trouvé${filteredCircuits.length !== 1 ? "s" : ""}` : contentType === "all" ? `${filtered.length} offre${filtered.length !== 1 ? "s" : ""} · ${filteredCircuits.length} circuit${filteredCircuits.length !== 1 ? "s" : ""}` : `${filtered.length} offre${filtered.length !== 1 ? "s" : ""} trouvée${filtered.length !== 1 ? "s" : ""}`}
               </p>
               <div className="flex items-center gap-3 ml-auto">
                 <div className="relative hidden sm:flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-2 shadow-sm">
@@ -1156,7 +1169,7 @@ export default function DestinationsPage({ interne = false }: { interne?: boolea
               </div>
             )}
 
-            {!loading && !error && contentType !== "circuits" && filtered.length === 0 && (
+            {!loading && !error && contentType !== "circuits" && filtered.length === 0 && (contentType === "offres" || filteredCircuits.length === 0) && (
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <Leaf className="w-12 h-12 text-slate-200 mb-4" />
                 <p className="text-slate-500 font-semibold text-lg mb-2">Aucune offre trouvée</p>
@@ -1178,12 +1191,33 @@ export default function DestinationsPage({ interne = false }: { interne?: boolea
                 ))}
               </div>
             )}
+
+            {!loading && !error && contentType === "circuits" && filteredCircuits.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {filteredCircuits.map((circuit) => (
+                  <CircuitCard key={circuit.id} circuit={circuit} onClick={() => setSelectedCircuit(circuit)} />
+                ))}
+              </div>
+            )}
+
+            {!loading && !error && contentType === "circuits" && filteredCircuits.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <Leaf className="w-12 h-12 text-slate-200 mb-4" />
+                <p className="text-slate-500 font-semibold text-lg mb-2">Aucun circuit trouvé</p>
+                <p className="text-slate-400 text-sm">Essayez de modifier vos filtres.</p>
+                {(activeFilterCount > 0 || search) && (
+                  <button onClick={() => { resetFilters(); setSearch(""); setSortBy("recent"); }} className="mt-4 px-5 py-2.5 bg-primary text-slate-900 font-bold rounded-xl text-sm hover:bg-primary/90 transition-colors">
+                    Réinitialiser les filtres
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </main>
 
-      {/* Circuits */}
-      {!loading && contentType !== "offres" && filteredCircuits.length > 0 && (
+      {/* Circuits — vue « Tout » uniquement (en mode Circuits ils sont dans la colonne de résultats) */}
+      {!loading && contentType === "all" && filteredCircuits.length > 0 && (
         <section className="bg-white border-t border-slate-100 py-16 px-6 md:px-20 lg:px-40">
           <div className="max-w-[1440px] mx-auto">
             <div className="flex items-center gap-3 mb-3">
