@@ -7,11 +7,9 @@ dist/
 build/
 
 # Environment files (NEVER commit secrets)
-.env
-.env.local
-.env.*.local
-.env.development
-.env.production
+# .env* couvre .env, .env.local, .env.dev, .env.docker, .env.production, *.bak, etc.
+.env*
+!.env.example
 
 # Logs
 *.log

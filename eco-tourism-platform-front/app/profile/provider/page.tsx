@@ -3902,9 +3902,9 @@ function ProviderProfilePageContent({ embedded = false, forcedTab, openEditOnMou
                             {collabDescCourte && <p className="text-xs text-slate-600">{collabDescCourte}</p>}
                             {collabDescLongue && <p className="text-xs text-slate-500">{collabDescLongue}</p>}
                             {/* Sous-types avec photos + tarifs + détails par unité */}
-                            {hb.subtypes.length > 0 && (
+                            {(hb.subtypes ?? []).length > 0 && (
                               <div className="space-y-3">
-                                {hb.subtypes.map((sv) => {
+                                {(hb.subtypes ?? []).map((sv) => {
                                   const stLabel = hbCat?.subtypes.find((s) => s.value === sv)?.label ?? sv;
                                   const fieldConfig = OFFER_DETAIL_FIELDS[sv];
                                   // Lire la contribution HebergBlock du prestataire (format hb_${sv})
@@ -4095,9 +4095,9 @@ function ProviderProfilePageContent({ embedded = false, forcedTab, openEditOnMou
                                   })()}
 
                                   {/* Sous-types avec leurs détails */}
-                                  {etape.subtypes.length > 0 && (
+                                  {(etape.subtypes ?? []).length > 0 && (
                                     <div className="space-y-2">
-                                      {etape.subtypes.map((sv) => {
+                                      {(etape.subtypes ?? []).map((sv) => {
                                         const stDef = cat?.subtypes.find((s) => s.value === sv);
                                         const stLabel = stDef?.label ?? sv;
                                         const nbU = etape.nb_unites?.[sv] ?? 1;
@@ -4528,7 +4528,7 @@ function ProviderProfilePageContent({ embedded = false, forcedTab, openEditOnMou
                     {/* Liste des activités */}
                     {activitesJour.map((act) => {
                       const actCat = PROVIDER_SCHEMA.find((c) => c.value === act.categorie);
-                      const actStLabels = act.subtypes.map((sv) => actCat?.subtypes.find((s) => s.value === sv)?.label ?? sv);
+                      const actStLabels = (act.subtypes ?? []).map((sv) => actCat?.subtypes.find((s) => s.value === sv)?.label ?? sv);
                       const firstPhoto = Object.values(act.entity_photos ?? {}).flat()[0] ?? act.photos?.[0];
                       const collabEntry  = circuitEtapeStatusMap.get(act.id);
                       const hasCollab    = !!act.collaborator_id && act.author_type !== "self";
@@ -9127,11 +9127,11 @@ function ProviderProfilePageContent({ embedded = false, forcedTab, openEditOnMou
                                     <div className="mt-3 space-y-1">
                                       {circuit.etapes.slice(0, 3).map((etape) => {
                                         const cat = PROVIDER_SCHEMA.find((c) => c.value === etape.categorie);
-                                        const stLabels = etape.subtypes.map((sv) => cat?.subtypes.find((s) => s.value === sv)?.label ?? sv);
+                                        const stLabels = (etape.subtypes ?? []).map((sv) => cat?.subtypes.find((s) => s.value === sv)?.label ?? sv);
                                         return (
                                           <div key={etape.id} className="flex items-center gap-2 text-xs">
                                             <span className="w-5 h-5 rounded-full bg-primary/10 text-primary font-black flex items-center justify-center text-[10px] shrink-0">{etape.jour}</span>
-                                            <span className="font-semibold text-slate-700 truncate">{etape.destination}</span>
+                                            <span className="font-semibold text-slate-700 truncate">{etape.titre || etape.destination}</span>
                                             <span className="text-slate-400 shrink-0">·</span>
                                             <span className="text-slate-400 truncate">{stLabels.join(", ")}</span>
                                           </div>
@@ -9549,11 +9549,11 @@ function ProviderProfilePageContent({ embedded = false, forcedTab, openEditOnMou
                               <div className="mt-3 space-y-1">
                                 {circuit.etapes.slice(0, 3).map((etape, i) => {
                                   const cat = PROVIDER_SCHEMA.find((c) => c.value === etape.categorie);
-                                  const stLabels = etape.subtypes.map((sv) => cat?.subtypes.find((s) => s.value === sv)?.label ?? sv);
+                                  const stLabels = (etape.subtypes ?? []).map((sv) => cat?.subtypes.find((s) => s.value === sv)?.label ?? sv);
                                   return (
                                     <div key={etape.id} className="flex items-center gap-2 text-xs">
                                       <span className="w-5 h-5 rounded-full bg-primary/10 text-primary font-black flex items-center justify-center text-[10px] shrink-0">{etape.jour}</span>
-                                      <span className="font-semibold text-slate-700 truncate">{etape.destination}</span>
+                                      <span className="font-semibold text-slate-700 truncate">{etape.titre || etape.destination}</span>
                                       <span className="text-slate-400 shrink-0">·</span>
                                       <span className="text-slate-400 truncate">{stLabels.join(", ")}</span>
                                     </div>

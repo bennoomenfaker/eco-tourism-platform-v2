@@ -161,18 +161,36 @@ export class PublicationService {
     });
     const parId = new Map(auteurs.map((a) => [a.user_id, a.full_name]));
 
+    // Comptage des likes en une seule requête groupée, puis tri décroissant :
+    // la carte et la page Lieux mettent en avant les lieux les plus aimés.
+    const likesRows = await this.likeRepo
+      .createQueryBuilder('l')
+      .select('l.publication_id', 'pid')
+      .addSelect('COUNT(*)', 'n')
+      .where('l.publication_id IN (:...ids)', { ids: situes.map((p) => p.id) })
+      .groupBy('l.publication_id')
+      .getRawMany<{ pid: string; n: string }>();
+    const likesParId = new Map(likesRows.map((r) => [r.pid, Number(r.n)]));
+
     // Photo d'auteur volontairement omise : elle est stockée en base64 et
     // pèserait une trentaine de kilo-octets par lieu, pour une vignette de carte.
-    return situes.map((p) => ({
-      id: p.id,
-      place_name: p.place_name ?? p.title,
-      description: p.description,
-      region: p.region,
-      image: p.images?.[0] ?? null,
-      latitude: Number(p.latitude),
-      longitude: Number(p.longitude),
-      author_name: parId.get(p.author_id) ?? null,
-    }));
+    return situes
+      .map((p) => ({
+        id: p.id,
+        place_name: p.place_name ?? p.title,
+        description: p.description,
+        region: p.region,
+        image: p.images?.[0] ?? null,
+        latitude: Number(p.latitude),
+        longitude: Number(p.longitude),
+        author_name: parId.get(p.author_id) ?? null,
+        likes_count: likesParId.get(p.id) ?? 0,
+      }))
+      .sort(
+        (a, b) =>
+          b.likes_count - a.likes_count ||
+          (a.place_name ?? '').localeCompare(b.place_name ?? '', 'fr'),
+      );
   }
 
   async findAllExperiences(): Promise<Publication[]> {

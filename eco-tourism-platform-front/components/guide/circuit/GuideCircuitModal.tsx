@@ -664,7 +664,7 @@ export default function GuideCircuitModal({ open, token, editingCircuit, onClose
                   {jourEtapes.map((act) => {
                     const actCat = PROVIDER_SCHEMA.find((c) => c.value === act.categorie);
                     const actCatLabel = actCat?.label ?? DOMAINES[act.categorie as string]?.label ?? act.categorie;
-                    const actStLabels = act.subtypes.map((sv) => actCat?.subtypes.find((s) => s.value === sv)?.label ?? sv);
+                    const actStLabels = (act.subtypes ?? []).map((sv) => actCat?.subtypes.find((s) => s.value === sv)?.label ?? sv);
                     const actExpertises = (act.fields?.expertises as string[] | undefined) ?? [];
                     const hasCollab = !!act.collaborator_id && act.author_type !== "self";
                     const collabEntry = etapeStatusMap.get(act.id);

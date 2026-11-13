@@ -17,19 +17,25 @@ function freePort(port: number) {
 }
 
 async function bootstrap() {
+  // Pas de `cors: true` ici : la politique est définie plus bas par
+  // enableCors (liste d'origines autorisées + credentials).
   const app = await NestFactory.create(AppModule, {
-    cors: true,
     bodyParser: true,
   });
 
   app.use(require('express').json({ limit: '5mb' }));
   app.use(require('express').urlencoded({ limit: '5mb', extended: true }));
 
+  // FRONTEND_URL + CORS_ORIGINS (liste séparée par des virgules) : plusieurs
+  // adresses peuvent servir le front (IP, domaine duckdns, localhost).
   const allowedOrigins = [
     'http://localhost:3000',
     'http://localhost:4000',
+    ...(process.env.CORS_ORIGINS ?? '').split(','),
     process.env.FRONTEND_URL,
-  ].filter(Boolean) as string[];
+  ]
+    .map((origin) => origin?.trim().replace(/\/$/, ''))
+    .filter(Boolean) as string[];
 
   app.enableCors({
     origin: allowedOrigins,

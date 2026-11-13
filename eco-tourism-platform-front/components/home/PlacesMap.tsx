@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { MapPin } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 
@@ -13,6 +14,8 @@ type Lieu = {
   latitude: number;
   longitude: number;
   author_name: string | null;
+  /** Nombre de « j'aime » ; le serveur trie déjà par ce champ décroissant. */
+  likes_count: number;
 };
 
 /** Même épingle que les autres cartes du site, pour rester cohérent. */
@@ -74,7 +77,10 @@ export default function PlacesMap() {
         `<div style="min-width:190px;max-width:230px">
            ${vignette}
            <strong style="display:block;font-size:.875rem;color:#0f172a">${echapper(l.place_name ?? "Lieu")}</strong>
-           ${l.author_name ? `<span style="font-size:.7rem;color:#64748b">Ajouté par ${echapper(l.author_name)}</span>` : ""}
+           ${l.region ? `<span style="font-size:.7rem;color:#64748b">${echapper(l.region)}</span>` : ""}
+           <div style="display:flex;align-items:center;gap:.25rem;margin-top:.35rem;font-size:.75rem;font-weight:700;color:#10b981">
+             <span style="color:#ef4444">♥</span>${l.likes_count} j'aime
+           </div>
          </div>`,
       );
     });
@@ -94,21 +100,26 @@ export default function PlacesMap() {
   }, [cssPrete, lieux]);
 
   return (
-    <section id="univers" className="scroll-mt-24 py-24 px-6 md:px-20 lg:px-40 max-w-[1440px] mx-auto">
+    <section id="univers" className="scroll-mt-24 px-6 md:px-20 lg:px-40 max-w-[1440px] mx-auto">
       <div className="flex flex-wrap items-end justify-between gap-4 mb-12">
         <div className="space-y-2">
           <h2 className="text-3xl font-black text-slate-900 dark:text-slate-50 tracking-tight">
             Les lieux de la communauté
           </h2>
           <p className="text-slate-500">
-            Des sites repérés et partagés par les éco-voyageurs, validés avant publication.
+            Des sites repérés et partagés par les éco-voyageurs, validés avant
+            publication. Les plus aimés apparaissent en premier.
           </p>
         </div>
         {lieux && lieux.length > 0 && (
-          <span className="inline-flex items-center gap-2 text-sm font-bold text-primary">
+          <Link
+            href="/places"
+            className="group inline-flex items-center gap-2 text-sm font-bold text-primary hover:underline"
+          >
             <MapPin className="w-4 h-4" />
             {lieux.length} lieu{lieux.length > 1 ? "x" : ""} sur la carte
-          </span>
+            <span className="transition-transform group-hover:translate-x-0.5">→</span>
+          </Link>
         )}
       </div>
 

@@ -3,11 +3,12 @@ services:
     image: postgres:15-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER: eco
-      POSTGRES_PASSWORD: eco_local
-      POSTGRES_DB: eco_tourism
+      POSTGRES_USER: ${DB_USERNAME:-eco}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Definir DB_PASSWORD dans .env (voir .env.example)}
+      POSTGRES_DB: ${DB_NAME:-eco_tourism}
     ports:
-      - "5432:5432"
+      # 127.0.0.1 : accessible depuis la machine locale uniquement, jamais depuis le réseau
+      - "127.0.0.1:5432:5432"
     volumes:
       - tourisme_pgdata_local:/var/lib/postgresql/data
 
@@ -15,7 +16,7 @@ services:
     image: mongo:7
     restart: unless-stopped
     ports:
-      - "27017:27017"
+      - "127.0.0.1:27017:27017"
     volumes:
       - tourisme_mongodata_local:/data/db
 

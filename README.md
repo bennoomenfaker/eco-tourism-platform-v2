@@ -53,7 +53,7 @@ BACKEND_URL=http://localhost:4000
 DB_HOST=localhost
 DB_PORT=5432
 DB_USERNAME=eco
-DB_PASSWORD=eco_local
+DB_PASSWORD=changez_moi          # doit correspondre à DB_PASSWORD du .env racine
 DB_NAME=eco_tourism
 MONGODB_URI=mongodb://localhost:27017/ecovoyage
 

@@ -1,0 +1,46 @@
+name: eco-tourism-platform-v2
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Compose LOCAL (dev) — PostgreSQL 5433 + MongoDB 27018, données de démo.
+# ⚠️ N'utilisez PAS `docker-compose.yml` en local : c'est le compose du SERVEUR
+#    (il référence ./backend, ./frontend, n'expose aucun port et pointe sur les
+#    volumes `tourisme_pgdata` vides). Utilisez CE fichier :
+#       docker compose -f docker-compose.dev.yml up -d
+# Les volumes `eco_pgdata` / `eco_mongodata` contiennent les données (externes).
+# ─────────────────────────────────────────────────────────────────────────────
+services:
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - eco_pgdata:/var/lib/postgresql/data
+    networks:
+      - tourisme_net
+
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:27018:27017"
+    volumes:
+      - eco_mongodata:/data/db
+    networks:
+      - tourisme_net
+
+networks:
+  tourisme_net:
+    external: true
+
+volumes:
+  eco_pgdata:
+    external: true
+    name: eco-tourism-platform-v2_eco_pgdata
+  eco_mongodata:
+    external: true
+    name: eco-tourism-platform-v2_eco_mongodata
