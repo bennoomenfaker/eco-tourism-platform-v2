@@ -15,6 +15,28 @@ function liste(v: any): any[] {
   return Array.isArray(v) ? v : (v?.data ?? v?.items ?? []);
 }
 
+/** Photo réelle hébergée par nous (Cloudinary), par opposition à un visuel de secours. */
+function photoReelle(url: unknown): boolean {
+  return typeof url === "string" && url.includes("res.cloudinary.com");
+}
+
+/** Rang de mise en avant : 0 = fiche d'hébergement réelle, 2 = le reste. */
+function rang(carte: Carte, offre: any | null): number {
+  if (!photoReelle(carte.image)) return 2;
+  return offre?.offer_type === "hebergement" ? 0 : 1;
+}
+
+/**
+ * Fiches volontairement écartées de la vitrine : trois variantes de la même
+ * nuitée de démonstration (« Écolodge Les Chênes »), qui occupaient à elles
+ * seules la moitié de la grille d'accueil. Les fiches restent en catalogue.
+ */
+const OFFRES_MASQUEES = new Set([
+  "dff8d68c-1899-4824-9be4-cc1602e632f9", // Nuitée Écolodge Les Chênes
+  "ba0d1e8d-afec-444b-9494-afa560c601b3", // Nuitée — Chambre Forêt
+  "0b4ad948-1a85-4cf4-b539-77a59329487e", // Choisissez votre formule
+]);
+
 export default function FeaturedExperiences() {
   const router = useRouter();
   const [cartes, setCartes] = useState<Carte[] | null>(null);
@@ -54,10 +76,29 @@ export default function FeaturedExperiences() {
         brut: c,
       }));
 
-      // Le meilleur score d'abord : c'est le critère que la plateforme met en avant.
+      // Vitrine : les fiches d'hébergement réelles d'abord (Matmata, Dar El
+      // Margoum, Toujane…), puis les offres les mieux notées. Un classement
+      // au seul score mettait en tête les fiches de démonstration.
+      const retenues = [...cartesOffres, ...cartesCircuits].filter(
+        (c) => !(c.kind === "offer" && OFFRES_MASQUEES.has(c.id)),
+      );
+
       setCartes(
-        [...cartesOffres, ...cartesCircuits]
-          .sort((a, b) => (b.score ?? -1) - (a.score ?? -1))
+        retenues
+          .sort((a, b) => {
+            const ra = rang(a, a.kind === "offer" ? a.brut : null);
+            const rb = rang(b, b.kind === "offer" ? b.brut : null);
+            if (ra !== rb) return ra - rb;
+            const score = (b.score ?? -1) - (a.score ?? -1);
+            return score !== 0 ? score : a.title.localeCompare(b.title, "fr");
+          })
+          // Un même partenaire n'occupe qu'une carte : sans cela, une seule
+          // organisation peut remplir toute la vitrine avec ses variantes.
+          .filter((c, i, toutes) => {
+            const org = c.kind === "offer" ? (c.brut?.organization_id ?? null) : null;
+            if (!org) return true;
+            return toutes.findIndex((t) => t.kind === "offer" && t.brut?.organization_id === org) === i;
+          })
           .slice(0, 6),
       );
     })();
@@ -71,7 +112,7 @@ export default function FeaturedExperiences() {
             Les mieux notées
           </h2>
           <p className="text-slate-500">
-            Offres et circuits publiés sur la plateforme, classés par score de durabilité.
+            Hébergements repérés sur le terrain et offres les mieux notées de la plateforme.
           </p>
         </div>
         <button

@@ -180,7 +180,10 @@ export class PublicationService {
         place_name: p.place_name ?? p.title,
         description: p.description,
         region: p.region,
+        category: p.place_category ?? null,
         image: p.images?.[0] ?? null,
+        // Galerie complète : le détail d'un lieu affiche plusieurs photos.
+        images: p.images ?? [],
         latitude: Number(p.latitude),
         longitude: Number(p.longitude),
         author_name: parId.get(p.author_id) ?? null,

@@ -23,19 +23,19 @@ import {
  */
 
 export const OFFER_PLACEHOLDERS = [
-  "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
-  "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80",
-  "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80",
-  "https://images.unsplash.com/photo-1472396961693-142e6e269027?w=800&q=80",
-  "https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?w=800&q=80",
-  "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80",
+  "https://res.cloudinary.com/depzhocsd/image/upload/v1794682446/eco-tourism/front-photo-1506905925346-21bda4d32df4.jpg",
+  "https://res.cloudinary.com/depzhocsd/image/upload/v1794682445/eco-tourism/front-photo-1501854140801-50d01698950b.jpg",
+  "https://res.cloudinary.com/depzhocsd/image/upload/v1794681962/eco-tourism/circuit-circuit-ouest-sauvage-guide-terroir.jpg",
+  "https://res.cloudinary.com/depzhocsd/image/upload/v1794682444/eco-tourism/front-photo-1472396961693-142e6e269027.jpg",
+  "https://res.cloudinary.com/depzhocsd/image/upload/v1794682447/eco-tourism/front-photo-1518173946687-a4c8892bbd9f.jpg",
+  "https://res.cloudinary.com/depzhocsd/image/upload/v1794682442/eco-tourism/front-photo-1469474968028-56623f02e42e.jpg",
 ];
 
 export const PARTNER_PLACEHOLDERS = [
-  "https://images.unsplash.com/photo-1552422535-c45813c61732?w=800&q=80",
-  "https://images.unsplash.com/photo-1528127269322-539801943592?w=800&q=80",
-  "https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=800&q=80",
-  "https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?w=800&q=80",
+  "https://res.cloudinary.com/depzhocsd/image/upload/v1794682449/eco-tourism/front-photo-1552422535-c45813c61732.jpg",
+  "https://res.cloudinary.com/depzhocsd/image/upload/v1794682448/eco-tourism/front-photo-1528127269322-539801943592.jpg",
+  "https://res.cloudinary.com/depzhocsd/image/upload/v1794682445/eco-tourism/front-photo-1504701954957-2010ec3bcec1.jpg",
+  "https://res.cloudinary.com/depzhocsd/image/upload/v1794682441/eco-tourism/front-photo-1462275646964-a0e3386b89fa.jpg",
 ];
 
 export function seedFromId(id: string, mod: number): number {
@@ -60,6 +60,7 @@ export type ModalCircuit = {
   id: string;
   title: string;
   cover_image: string | null;
+  images?: string[] | null;
   owner_type?: string | null;
   author_name?: string | null;
   author_photo?: string | null;
@@ -270,7 +271,16 @@ export function CircuitModal({ circuit, onClose }: { circuit: ModalCircuit; onCl
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-        <ImageGallery images={circuit.cover_image ? [circuit.cover_image] : []} fallback={fallback} />
+        <ImageGallery
+          images={
+            circuit.images?.length
+              ? circuit.images
+              : circuit.cover_image
+                ? [circuit.cover_image]
+                : []
+          }
+          fallback={fallback}
+        />
 
         <button onClick={onClose}
           className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/70 transition-colors z-10">

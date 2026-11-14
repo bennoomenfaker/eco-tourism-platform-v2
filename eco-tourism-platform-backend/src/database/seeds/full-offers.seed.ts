@@ -37,29 +37,29 @@ function dispoRange(start: string, end: string): Dispo {
 
 const IMG = {
   forest:
-    'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80',
+    'https://res.cloudinary.com/depzhocsd/image/upload/v1794681962/eco-tourism/circuit-circuit-ouest-sauvage-guide-terroir.jpg',
   lodge:
-    'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=1200&q=80',
+    'https://res.cloudinary.com/depzhocsd/image/upload/v1794681958/eco-tourism/circuit-sejour-nature-ecolodge-2-nuits.jpg',
   food:
-    'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80',
+    'https://res.cloudinary.com/depzhocsd/image/upload/v1794681959/eco-tourism/circuit-immersion-gastronomique-locale-1-jour.jpg',
   trek:
-    'https://images.unsplash.com/photo-1551632811-561732d1e67f?w=1200&q=80',
+    'https://res.cloudinary.com/depzhocsd/image/upload/v1794681957/eco-tourism/circuit-kayak-sentiers-cotiers-2-jours.jpg',
   kayak:
-    'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80',
+    'https://res.cloudinary.com/depzhocsd/image/upload/v1794681957/eco-tourism/circuit-kayak-sentiers-cotiers-2-jours.jpg',
   pottery:
-    'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=1200&q=80',
+    'https://res.cloudinary.com/depzhocsd/image/upload/v1794682307/eco-tourism/migre-f8885008f8.jpg',
   yoga:
-    'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1200&q=80',
+    'https://res.cloudinary.com/depzhocsd/image/upload/v1794681961/eco-tourism/circuit-weekend-yoga-nature-ecolodge.jpg',
   bike:
-    'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=1200&q=80',
+    'https://res.cloudinary.com/depzhocsd/image/upload/v1794681957/eco-tourism/circuit-kayak-sentiers-cotiers-2-jours.jpg',
   bus:
-    'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=1200&q=80',
+    'https://res.cloudinary.com/depzhocsd/image/upload/v1794682308/eco-tourism/migre-6f57ca2e20.jpg',
   birds:
-    'https://images.unsplash.com/photo-1444464666168-49d633b86797?w=1200&q=80',
+    'https://res.cloudinary.com/depzhocsd/image/upload/v1794681964/eco-tourism/circuit-observation-oiseaux-lac-ichkeul.jpg',
   heritage:
-    'https://images.unsplash.com/photo-1565008576549-57569a49371d?w=1200&q=80',
+    'https://res.cloudinary.com/depzhocsd/image/upload/v1794681960/eco-tourism/circuit-circuit-patrimoine-berbere-3-jours.jpg',
   volunteer:
-    'https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=1200&q=80',
+    'https://res.cloudinary.com/depzhocsd/image/upload/v1794682306/eco-tourism/migre-936373b4ba.jpg',
 };
 
 interface CollabSpec {

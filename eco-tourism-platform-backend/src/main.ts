@@ -23,6 +23,11 @@ async function bootstrap() {
     bodyParser: true,
   });
 
+  // Les listes publiques (catalogue complet) pèsent ~95 Ko ; sur un lien
+  // distant, la réponse non compressée met plusieurs secondes. gzip la
+  // ramène à ~15 Ko.
+  app.use(require('compression')({ threshold: 1024 }));
+
   app.use(require('express').json({ limit: '5mb' }));
   app.use(require('express').urlencoded({ limit: '5mb', extended: true }));
 

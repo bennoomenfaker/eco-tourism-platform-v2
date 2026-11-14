@@ -42,6 +42,11 @@ export class Publication {
   @Column({ type: 'varchar', nullable: true })
   region!: string | null;
 
+  // Nature du lieu (site archéologique, oasis, plage…), utilisée par les
+  // filtres de la carte d'accueil. Nullable : les lieux déjà en base n'en ont pas.
+  @Column({ type: 'varchar', nullable: true })
+  place_category!: string | null;
+
   // pending = en attente de validation / approved = visible publiquement / rejected = refusé
   @Column({ type: 'varchar', default: 'pending' })
   status!: string;

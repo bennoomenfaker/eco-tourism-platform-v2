@@ -7,6 +7,7 @@ import { ArrowLeft, MapPin, User } from "lucide-react";
 import Navbar from "@/components/home/Navbar";
 import Footer from "@/components/home/Footer";
 import { apiFetch } from "@/lib/api";
+import { ImageGallery, OFFER_PLACEHOLDERS } from "@/components/destinations/DetailModals";
 
 const MapView = dynamic(() => import("@/components/map/MapView"), {
   ssr: false,
@@ -19,6 +20,8 @@ type Lieu = {
   description: string | null;
   region: string | null;
   image: string | null;
+  /** Galerie complète (plusieurs photos par lieu). */
+  images?: string[] | null;
   latitude: number;
   longitude: number;
   author_name: string | null;
@@ -84,20 +87,19 @@ export default function PlaceDetailPage() {
         ) : (
           <article className="bg-white rounded-3xl border border-slate-100 shadow-lg overflow-hidden">
             {/* Visuel */}
-            <div className="relative h-80 md:h-96 overflow-hidden">
-              {lieu.image ? (
-                <div
-                  className="absolute inset-0 bg-cover bg-center"
-                  style={{ backgroundImage: `url('${lieu.image}')` }}
-                />
-              ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-100 to-emerald-50 flex items-center justify-center">
-                  <MapPin className="w-14 h-14 text-emerald-300" />
-                </div>
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+            <div className="relative">
+              <ImageGallery
+                images={
+                  lieu.images?.length
+                    ? lieu.images
+                    : lieu.image
+                      ? [lieu.image]
+                      : []
+                }
+                fallback={OFFER_PLACEHOLDERS[0]}
+              />
               {lieu.region && (
-                <span className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full text-[11px] font-extrabold text-slate-700 uppercase tracking-widest shadow-sm">
+                <span className="absolute top-4 left-4 z-10 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full text-[11px] font-extrabold text-slate-700 uppercase tracking-widest shadow-sm">
                   {lieu.region}
                 </span>
               )}

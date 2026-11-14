@@ -165,12 +165,12 @@ function getScoreLabel(score: number | null, role: string): string {
 // ─── Feed helpers ──────────────────────────────────────────────────────────────
 
 const OFFER_PLACEHOLDERS = [
-  "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
-  "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80",
-  "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80",
-  "https://images.unsplash.com/photo-1472396961693-142e6e269027?w=800&q=80",
-  "https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?w=800&q=80",
-  "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80",
+  "https://res.cloudinary.com/depzhocsd/image/upload/v1794682446/eco-tourism/front-photo-1506905925346-21bda4d32df4.jpg",
+  "https://res.cloudinary.com/depzhocsd/image/upload/v1794682445/eco-tourism/front-photo-1501854140801-50d01698950b.jpg",
+  "https://res.cloudinary.com/depzhocsd/image/upload/v1794681962/eco-tourism/circuit-circuit-ouest-sauvage-guide-terroir.jpg",
+  "https://res.cloudinary.com/depzhocsd/image/upload/v1794682444/eco-tourism/front-photo-1472396961693-142e6e269027.jpg",
+  "https://res.cloudinary.com/depzhocsd/image/upload/v1794682447/eco-tourism/front-photo-1518173946687-a4c8892bbd9f.jpg",
+  "https://res.cloudinary.com/depzhocsd/image/upload/v1794682442/eco-tourism/front-photo-1469474968028-56623f02e42e.jpg",
 ];
 
 function seedFromId(id: string, mod: number) { return id.charCodeAt(0) % mod; }

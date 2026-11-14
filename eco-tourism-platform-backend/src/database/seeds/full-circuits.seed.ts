@@ -19,23 +19,23 @@ config({ path: join(__dirname, '../../../.env') });
 
 const IMG = {
   forest:
-    'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80',
+    'https://res.cloudinary.com/depzhocsd/image/upload/v1794681962/eco-tourism/circuit-circuit-ouest-sauvage-guide-terroir.jpg',
   trek:
-    'https://images.unsplash.com/photo-1551632811-561732d1e67f?w=1200&q=80',
+    'https://res.cloudinary.com/depzhocsd/image/upload/v1794681957/eco-tourism/circuit-kayak-sentiers-cotiers-2-jours.jpg',
   heritage:
-    'https://images.unsplash.com/photo-1565008576549-57569a49371d?w=1200&q=80',
+    'https://res.cloudinary.com/depzhocsd/image/upload/v1794681960/eco-tourism/circuit-circuit-patrimoine-berbere-3-jours.jpg',
   lodge:
-    'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=1200&q=80',
+    'https://res.cloudinary.com/depzhocsd/image/upload/v1794681958/eco-tourism/circuit-sejour-nature-ecolodge-2-nuits.jpg',
   food:
-    'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80',
+    'https://res.cloudinary.com/depzhocsd/image/upload/v1794681959/eco-tourism/circuit-immersion-gastronomique-locale-1-jour.jpg',
   birds:
-    'https://images.unsplash.com/photo-1444464666168-49d633b86797?w=1200&q=80',
+    'https://res.cloudinary.com/depzhocsd/image/upload/v1794681964/eco-tourism/circuit-observation-oiseaux-lac-ichkeul.jpg',
   kayak:
-    'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80',
+    'https://res.cloudinary.com/depzhocsd/image/upload/v1794681957/eco-tourism/circuit-kayak-sentiers-cotiers-2-jours.jpg',
   yoga:
-    'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1200&q=80',
+    'https://res.cloudinary.com/depzhocsd/image/upload/v1794681961/eco-tourism/circuit-weekend-yoga-nature-ecolodge.jpg',
   coast:
-    'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80',
+    'https://res.cloudinary.com/depzhocsd/image/upload/v1794681965/eco-tourism/circuit-grand-trek-tabarka-4-jours-cote-foret.jpg',
 };
 
 type Dispo =

@@ -15,6 +15,7 @@ export type Circuit = {
   description: string | null;
   nb_jours: number;
   cover_image: string | null;
+  images?: string[] | null;
   etapes: any[];
   hebergement: any | null;
   tags: string[] | null;

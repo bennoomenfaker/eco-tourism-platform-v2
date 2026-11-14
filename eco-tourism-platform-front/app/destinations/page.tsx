@@ -813,15 +813,35 @@ export default function DestinationsPage({ interne = false }: { interne?: boolea
   const [selectedExperience, setSelectedExperience] = useState<Experience | null>(null);
 
   useEffect(() => {
+    let alive = true;
+    // 1) Offres + circuits : c'est ce qui remplit la grille principale, donc
+    //    on l'affiche dès que ces deux listes sont là.
     Promise.all([
       apiFetch<Offer[]>("/offers"),
       apiFetch<Circuit[]>("/circuits/all-public"),
+    ])
+      .then(([o, c]) => {
+        if (!alive) return;
+        setOffers(o);
+        setCircuits(c);
+      })
+      .catch((e: Error) => { if (alive) setError(e.message); })
+      .finally(() => { if (alive) setLoading(false); });
+
+    // 2) Projets + expériences : sections secondaires, chargées en parallèle
+    //    sans retarder l'affichage des offres et circuits.
+    Promise.all([
       apiFetch<Project[]>("/project-owner/projects/public"),
       apiFetch<Experience[]>("/publications/experiences"),
     ])
-      .then(([o, c, p, e]) => { setOffers(o); setCircuits(c); setProjects(p); setExperiences(e); })
-      .catch((e: Error) => setError(e.message))
-      .finally(() => setLoading(false));
+      .then(([p, e]) => {
+        if (!alive) return;
+        setProjects(p);
+        setExperiences(e);
+      })
+      .catch(() => { /* sections secondaires silencieuses */ });
+
+    return () => { alive = false; };
   }, []);
 
   const filtered = useMemo(() => {
@@ -1058,7 +1078,7 @@ export default function DestinationsPage({ interne = false }: { interne?: boolea
 
       {/* Hero */}
       {!interne && <div className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-20 px-6 md:px-20 lg:px-40 overflow-hidden">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80')", backgroundSize: "cover", backgroundPosition: "center" }} />
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "url('https://res.cloudinary.com/depzhocsd/image/upload/v1794682442/eco-tourism/front-photo-1469474968028-56623f02e42e.jpg')", backgroundSize: "cover", backgroundPosition: "center" }} />
         <div className="relative max-w-[1440px] mx-auto">
           <div className="flex items-center gap-2 mb-4">
             <Leaf className="w-6 h-6 text-primary" />

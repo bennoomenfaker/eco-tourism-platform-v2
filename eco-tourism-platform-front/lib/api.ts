@@ -32,73 +32,127 @@ async function doRefresh(): Promise<string> {
   return data.access_token;
 }
 
+const PUBLIC_GET_TTL_MS = 60_000;
+const publicGetCache = new Map<string, { at: number; data: unknown }>();
+const publicGetInFlight = new Map<string, Promise<unknown>>();
+
+/** Vide le cache des GET publics (après une publication, un like, etc.). */
+export function invalidatePublicCache(prefix?: string) {
+  if (!prefix) {
+    publicGetCache.clear();
+    return;
+  }
+  for (const key of publicGetCache.keys()) {
+    if (key.startsWith(prefix)) publicGetCache.delete(key);
+  }
+}
+
 export async function apiFetch<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const makeRequest = (tokenOverride?: string) => {
-    const token =
-      tokenOverride ??
-      (typeof window !== "undefined" ? localStorage.getItem("access_token") : null);
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      ...(options.headers as Record<string, string> || {}),
-    };
-    if (token) headers["Authorization"] = `Bearer ${token}`;
+  const method = (options.method ?? "GET").toUpperCase();
+  const tokenActuel =
+    typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
 
-    return fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
-  };
+  // Cache mémoire des GET publics (catalogue, lieux, circuits…) : la page
+  // /destinations redemande les mêmes listes à chaque montage. Les requêtes
+  // authentifiées ne sont jamais mises en cache.
+  const cacheable =
+    method === "GET" &&
+    !tokenActuel &&
+    !options.body &&
+    endpoint.startsWith("/") &&
+    !endpoint.startsWith("/auth");
 
-  let res = await makeRequest();
-
-  if (res.status === 401) {
-    const hasSession = typeof window !== "undefined" && !!localStorage.getItem("refresh_token");
-
-    if (!hasSession) {
-      const errData = await res.json().catch(() => null);
-      const msg = errData?.message || errData?.error || "Identifiants incorrects.";
-      throw new Error(Array.isArray(msg) ? msg.join(", ") : msg);
+  if (cacheable) {
+    const hit = publicGetCache.get(endpoint);
+    if (hit && Date.now() - hit.at < PUBLIC_GET_TTL_MS) {
+      return hit.data as T;
     }
+    const pending = publicGetInFlight.get(endpoint);
+    if (pending) return pending as Promise<T>;
+  }
 
-    // If another request is already refreshing, wait for it
-    if (isRefreshing) {
-      const newToken = await new Promise<string>((resolve, reject) => {
-        refreshQueue.push((token) => (token ? resolve(token) : reject()));
-      });
-      res = await makeRequest(newToken);
-    } else {
-      isRefreshing = true;
-      try {
-        const newToken = await doRefresh();
-        refreshQueue.forEach((cb) => cb(newToken));
-        refreshQueue = [];
+  const executer = async (): Promise<T> => {
+    const makeRequest = (tokenOverride?: string) => {
+      const token =
+        tokenOverride ?? tokenActuel;
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+        ...(options.headers as Record<string, string> || {}),
+      };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      return fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
+    };
+
+    let res = await makeRequest();
+
+    if (res.status === 401) {
+      const hasSession = typeof window !== "undefined" && !!localStorage.getItem("refresh_token");
+
+      if (!hasSession) {
+        const errData = await res.json().catch(() => null);
+        const msg = errData?.message || errData?.error || "Identifiants incorrects.";
+        throw new Error(Array.isArray(msg) ? msg.join(", ") : msg);
+      }
+
+      // If another request is already refreshing, wait for it
+      if (isRefreshing) {
+        const newToken = await new Promise<string>((resolve, reject) => {
+          refreshQueue.push((token) => (token ? resolve(token) : reject()));
+        });
         res = await makeRequest(newToken);
-      } catch {
-        refreshQueue.forEach((cb) => cb(""));
-        refreshQueue = [];
-        // Refresh failed — clear session and redirect to login
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("access_token");
-          localStorage.removeItem("refresh_token");
-          localStorage.removeItem("user");
-          window.location.href = "/auth/login";
+      } else {
+        isRefreshing = true;
+        try {
+          const newToken = await doRefresh();
+          refreshQueue.forEach((cb) => cb(newToken));
+          refreshQueue = [];
+          res = await makeRequest(newToken);
+        } catch {
+          refreshQueue.forEach((cb) => cb(""));
+          refreshQueue = [];
+          // Refresh failed — clear session and redirect to login
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token");
+            localStorage.removeItem("user");
+            window.location.href = "/auth/login";
+          }
+          throw new Error("Session expirée. Veuillez vous reconnecter.");
+        } finally {
+          isRefreshing = false;
         }
-        throw new Error("Session expirée. Veuillez vous reconnecter.");
-      } finally {
-        isRefreshing = false;
       }
     }
-  }
 
-  const data = await res.json().catch(() => null);
+    const data = await res.json().catch(() => null);
 
-  if (!res.ok) {
-    const message = data?.message || data?.error || "Une erreur est survenue";
-    const msgStr = typeof message === "object" && message !== null
-      ? (message.message ?? JSON.stringify(message))
-      : Array.isArray(message) ? message.join(", ") : message;
-    throw new ApiError(msgStr, res.status, data);
-  }
+    if (!res.ok) {
+      const message = data?.message || data?.error || "Une erreur est survenue";
+      const msgStr = typeof message === "object" && message !== null
+        ? (message.message ?? JSON.stringify(message))
+        : Array.isArray(message) ? message.join(", ") : message;
+      throw new ApiError(msgStr, res.status, data);
+    }
 
-  return data;
+    return data as T;
+  };
+
+  if (!cacheable) return executer();
+
+  const promesse = executer()
+    .then((data) => {
+      publicGetCache.set(endpoint, { at: Date.now(), data });
+      return data;
+    })
+    .finally(() => {
+      publicGetInFlight.delete(endpoint);
+    });
+
+  publicGetInFlight.set(endpoint, promesse);
+  return promesse;
 }
+

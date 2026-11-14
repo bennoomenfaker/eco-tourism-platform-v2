@@ -26,6 +26,10 @@ export class Circuit {
   @Column({ type: 'varchar', nullable: true })
   cover_image!: string | null;
 
+  // Galerie multi-images (URLs Cloudinary), séparées par des virgules.
+  @Column({ type: 'simple-array', nullable: true })
+  images!: string[] | null;
+
   @Column({ type: 'jsonb', default: [] })
   etapes!: object[];
 

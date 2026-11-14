@@ -143,17 +143,43 @@ export class CircuitService {
 
     // Charger toutes les collaborations en une seule requête (batch)
     const circuitIds = circuits.map((c) => c.id);
-    const allCollabs = await this.collabRepo.find({
-      where: { circuit_id: In(circuitIds) },
-    });
+    const guideUserIds = [
+      ...new Set(
+        circuits.filter((c) => c.owner_type === 'guide' && c.provider_id).map((c) => c.provider_id),
+      ),
+    ];
+    const providerUserIds = [
+      ...new Set(
+        circuits.filter((c) => c.owner_type !== 'guide' && c.provider_id).map((c) => c.provider_id),
+      ),
+    ];
+
+    // Auteurs chargés en une requête par rôle puis indexés : la liste publique
+    // faisait auparavant 1 requête par circuit (N+1).
+    const [allCollabs, guides, providers] = await Promise.all([
+      this.collabRepo.find({
+        where: { circuit_id: In(circuitIds) },
+      }),
+      guideUserIds.length
+        ? this.guideRepo.find({ where: { user_id: In(guideUserIds) } })
+        : Promise.resolve([] as Guide[]),
+      providerUserIds.length
+        ? this.providerRepo.find({ where: { user_id: In(providerUserIds) } as any })
+        : Promise.resolve([] as Provider[]),
+    ]);
+    const guidesParUser = new Map<string, Guide>(
+      (guides as Guide[]).map((g) => [g.user_id, g] as [string, Guide]),
+    );
+    const providersParUser = new Map<string, any>(
+      (providers as any[]).map((p) => [p.user_id, p] as [string, any]),
+    );
     const collabsByCircuit: Record<string, typeof allCollabs> = {};
     allCollabs.forEach((col) => {
       if (!collabsByCircuit[col.circuit_id]) collabsByCircuit[col.circuit_id] = [];
       collabsByCircuit[col.circuit_id].push(col);
     });
 
-    return Promise.all(
-      circuits.map(async (circuit) => {
+    return circuits.map((circuit) => {
         // ── Enrichissement collab (comme findPublicDetail) ──────────────────
         // Seules les collaborations acceptées sortent au public : une étape
         // dont le partenaire n'a pas encore répondu, ou a refusé, relève de la
@@ -190,21 +216,20 @@ export class CircuitService {
         let author_photo: string | null = null;
 
         if (circuit.owner_type === 'guide') {
-          const guide = await this.guideRepo.findOne({ where: { user_id: circuit.provider_id } });
+          const guide = guidesParUser.get(circuit.provider_id);
           author_name = guide?.full_name ?? null;
           author_photo = guide?.photo ?? null;
         } else {
-          const provider = await this.providerRepo.findOne({ where: { user_id: circuit.provider_id } as any });
-          author_name = (provider as any)?.full_name ?? null;
-          author_photo = (provider as any)?.photo ?? null;
+          const provider = providersParUser.get(circuit.provider_id);
+          author_name = provider?.full_name ?? null;
+          author_photo = provider?.photo ?? null;
         }
 
         return enrichCircuitWithBookingFields(
           { ...circuit, etapes, hebergement: enrichedHeberg, author_name, author_photo },
           collabs,
         );
-      }),
-    );
+    });
   }
 
   async findPublishedByUser(userId: string): Promise<Circuit[]> {

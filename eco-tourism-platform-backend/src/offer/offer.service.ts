@@ -234,54 +234,90 @@ export class OfferService {
       order: { created_at: 'DESC' },
     });
 
+    if (offers.length === 0) return [];
+
     // Une seule requête pour toutes les offres : la liste publique est
     // parcourue en entier à chaque affichage du catalogue.
-    const collabRows = offers.length
-      ? await this.collabRepo.find({ where: { offer_id: In(offers.map((o) => o.id)) } })
-      : [];
+    const offreIds = offers.map((o) => o.id);
+    const guideUserIds = [
+      ...new Set(
+        offers.filter((o) => o.author_type === 'guide' && o.author_id).map((o) => o.author_id),
+      ),
+    ];
+    const providerUserIds = [
+      ...new Set(
+        offers.filter((o) => o.author_type !== 'guide' && o.author_id).map((o) => o.author_id),
+      ),
+    ];
+    const orgIds = [
+      ...new Set(offers.map((o) => o.organization_id).filter((id): id is string => !!id)),
+    ];
+
+    // Tout est chargé en parallèle et indexé en mémoire : plus de requête
+    // par offre (le N+1 faisait ~1,5 s pour 51 offres).
+    const [collabRows, guides, providers, orgs] = await Promise.all([
+      this.collabRepo.find({ where: { offer_id: In(offreIds) } }),
+      guideUserIds.length
+        ? this.guideRepo.find({ where: { user_id: In(guideUserIds) } })
+        : Promise.resolve([] as Guide[]),
+      providerUserIds.length
+        ? this.providerRepo.find({ where: { user_id: In(providerUserIds) } as any })
+        : Promise.resolve([] as Provider[]),
+      orgIds.length
+        ? this.orgRepo.find({ where: { id: In(orgIds) } as any })
+        : Promise.resolve([] as Organization[]),
+    ]);
+
     const collabsParOffre = new Map<string, OfferCollaboration[]>();
     for (const c of collabRows) {
       const liste = collabsParOffre.get(c.offer_id) ?? [];
       liste.push(c);
       collabsParOffre.set(c.offer_id, liste);
     }
-
-    return Promise.all(
-      offers.map(async (offer) => {
-        let author_name: string | null = null;
-        let author_photo: string | null = null;
-        let org_name: string | null = null;
-        let org_logo: string | null = null;
-
-        if (offer.author_type === 'guide') {
-          const guide = await this.guideRepo.findOne({ where: { user_id: offer.author_id } });
-          author_name = guide?.full_name ?? null;
-          author_photo = guide?.photo ?? null;
-        } else {
-          const provider = await this.providerRepo.findOne({ where: { user_id: offer.author_id } as any });
-          author_name = (provider as any)?.full_name ?? null;
-          author_photo = (provider as any)?.photo ?? null;
-        }
-
-        if (offer.organization_id) {
-          const org = await this.orgRepo.findOne({ where: { id: offer.organization_id } as any });
-          org_name = (org as any)?.name ?? null;
-          org_logo = (org as any)?.logo ?? null;
-        }
-
-        return enrichOfferWithVariantFields({
-          ...offer,
-          details: this.detailsPublics(
-            (offer as any).details,
-            collabsParOffre.get(offer.id) ?? [],
-          ),
-          author_name,
-          author_photo,
-          org_name,
-          org_logo,
-        } as Offer);
-      }),
+    const guidesParUser = new Map<string, Guide>(
+      (guides as Guide[]).map((g) => [g.user_id, g] as [string, Guide]),
     );
+    const providersParUser = new Map<string, any>(
+      (providers as any[]).map((p) => [p.user_id, p] as [string, any]),
+    );
+    const orgsParId = new Map<string, any>(
+      (orgs as any[]).map((o) => [o.id, o] as [string, any]),
+    );
+
+    return offers.map((offer) => {
+      let author_name: string | null = null;
+      let author_photo: string | null = null;
+      let org_name: string | null = null;
+      let org_logo: string | null = null;
+
+      if (offer.author_type === 'guide') {
+        const guide = guidesParUser.get(offer.author_id);
+        author_name = guide?.full_name ?? null;
+        author_photo = guide?.photo ?? null;
+      } else {
+        const provider = providersParUser.get(offer.author_id);
+        author_name = provider?.full_name ?? null;
+        author_photo = provider?.photo ?? null;
+      }
+
+      if (offer.organization_id) {
+        const org = orgsParId.get(offer.organization_id);
+        org_name = org?.name ?? null;
+        org_logo = org?.logo ?? null;
+      }
+
+      return enrichOfferWithVariantFields({
+        ...offer,
+        details: this.detailsPublics(
+          (offer as any).details,
+          collabsParOffre.get(offer.id) ?? [],
+        ),
+        author_name,
+        author_photo,
+        org_name,
+        org_logo,
+      } as Offer);
+    });
   }
 
   async findById(id: string): Promise<Offer> {
