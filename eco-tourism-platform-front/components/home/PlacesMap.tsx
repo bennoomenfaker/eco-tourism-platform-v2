@@ -13,6 +13,8 @@ type Lieu = {
   /** Nature du lieu, renseignée en base ; null pour les lieux non classés. */
   category: string | null;
   image: string | null;
+  /** Galerie : plusieurs photos par lieu (la première sert de vignette). */
+  images?: string[] | null;
   latitude: number;
   longitude: number;
   author_name: string | null;
@@ -54,6 +56,7 @@ export default function PlacesMap() {
   const [lieux, setLieux] = useState<Lieu[] | null>(null);
   const [selection, setSelection] = useState<Lieu | null>(null);
   const [filtre, setFiltre] = useState<string | null>(null);
+  const [photoIdx, setPhotoIdx] = useState(0);
 
   // Filtres proposés : les catégories réellement présentes, avec leur nombre.
   const categories = useMemo(() => {
@@ -71,6 +74,14 @@ export default function PlacesMap() {
     () => (lieux ?? []).filter((l) => !filtre || categorieDe(l) === filtre),
     [lieux, filtre],
   );
+
+  // Toutes les photos du lieu ouvert : la fiche doit montrer la galerie,
+  // pas seulement la vignette utilisée sur la carte.
+  const photosDuLieu = useMemo(() => {
+    const galerie = (selection?.images ?? []).filter(Boolean);
+    if (galerie.length > 0) return galerie;
+    return selection?.image ? [selection.image] : [];
+  }, [selection]);
 
   // Modale : fermeture au clavier et blocage du défilement derrière.
   useEffect(() => {
@@ -123,7 +134,7 @@ export default function PlacesMap() {
         alt: l.place_name ?? "Lieu",
       }).addTo(carte);
       // Un clic ouvre la fiche dans une modale (comme sur Google Maps), pas une bulle.
-      marqueur.on("click", () => setSelection(l));
+      marqueur.on("click", () => { setPhotoIdx(0); setSelection(l); });
       return { lieu: l, marker: marqueur };
     });
 
@@ -260,13 +271,54 @@ export default function PlacesMap() {
               <X className="w-5 h-5" />
             </button>
 
-            {selection.image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={selection.image}
-                alt={selection.place_name ?? "Lieu"}
-                className="h-56 w-full object-cover"
-              />
+            {photosDuLieu.length > 0 ? (
+              <div className="relative h-56 w-full overflow-hidden bg-slate-900">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={photosDuLieu[Math.min(photoIdx, photosDuLieu.length - 1)]}
+                  alt={`${selection.place_name ?? "Lieu"} — photo ${photoIdx + 1}`}
+                  className="h-56 w-full object-cover"
+                />
+                {photosDuLieu.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      aria-label="Photo précédente"
+                      onClick={() =>
+                        setPhotoIdx((i) => (i - 1 + photosDuLieu.length) % photosDuLieu.length)
+                      }
+                      className="absolute left-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm hover:bg-black/70"
+                    >
+                      ‹
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="Photo suivante"
+                      onClick={() => setPhotoIdx((i) => (i + 1) % photosDuLieu.length)}
+                      className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm hover:bg-black/70"
+                    >
+                      ›
+                    </button>
+                    <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+                      {photosDuLieu.map((photo, i) => (
+                        <button
+                          key={`${photo}-${i}`}
+                          type="button"
+                          aria-label={`Photo ${i + 1}`}
+                          aria-pressed={i === photoIdx}
+                          onClick={() => setPhotoIdx(i)}
+                          className={`h-2 w-2 rounded-full transition-all ${
+                            i === photoIdx ? "scale-125 bg-white" : "bg-white/50"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="absolute right-3 top-3 rounded-full bg-black/50 px-2 py-0.5 text-[11px] font-bold text-white backdrop-blur-sm">
+                      {photoIdx + 1}/{photosDuLieu.length}
+                    </span>
+                  </>
+                )}
+              </div>
             ) : (
               <div className="flex h-32 w-full items-center justify-center bg-primary/10">
                 <MapPin className="w-10 h-10 text-primary" />

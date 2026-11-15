@@ -18,6 +18,8 @@ type Lieu = {
   description: string | null;
   region: string | null;
   image: string | null;
+  /** Galerie complète : plusieurs photos par lieu. */
+  images?: string[] | null;
   latitude: number;
   longitude: number;
   author_name: string | null;
@@ -215,6 +217,11 @@ function PlaceCard({ lieu }: { lieu: Lieu }) {
           <Heart className="w-3 h-3 text-red-500 fill-red-500" />
           {lieu.likes_count ?? 0}
         </span>
+        {(lieu.images?.length ?? 0) > 1 && (
+          <span className="absolute bottom-3 right-3 rounded-full bg-black/55 px-2 py-0.5 text-[11px] font-bold text-white backdrop-blur-sm">
+            {lieu.images!.length} photos
+          </span>
+        )}
       </div>
       <div className="p-5 flex flex-col flex-1">
         <h3 className="font-extrabold text-slate-900 text-base mb-2 line-clamp-2 group-hover:text-primary transition-colors">

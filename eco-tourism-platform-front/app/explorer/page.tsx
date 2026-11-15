@@ -972,18 +972,18 @@ function ExplorerContent() {
 
         {/* ── Sidebar ─────────────────────────────────────────────────────── */}
         <DashboardSidebar>
-          <div className="p-6 flex flex-col h-full">
-            <div className="flex items-center gap-3 mb-10">
+          <div className="px-4 py-4 flex flex-col h-full">
+            <div className="flex items-center gap-3 mb-5">
               <Leaf className="text-primary w-8 h-8" />
               <h1 className="text-xl font-extrabold tracking-tight">Éco-Voyage</h1>
             </div>
 
-            <nav className="flex-1 space-y-1">
+            <nav className="flex-1 space-y-0.5">
               {navItems.map((item) => (
                 <button
                   key={item.label}
                   onClick={() => { closeNav(); router.push(item.href); }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                  className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-sm transition-all ${
                     item.href === "/explorer"
                       ? "bg-primary/10 text-primary font-bold"
                       : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
@@ -995,7 +995,7 @@ function ExplorerContent() {
               ))}
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                className="w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
               >
                 <span className="material-symbols-outlined">logout</span>
                 <span>Déconnexion</span>
@@ -1003,7 +1003,7 @@ function ExplorerContent() {
             </nav>
 
             {profile && (
-              <div className="mt-auto pt-6 border-t border-slate-100 dark:border-slate-800">
+              <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800">
                 <div className="flex justify-between items-center mb-2">
                   <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Profil complété</p>
                   <p className="text-xs font-extrabold text-primary">{profile.profile_completion}%</p>
@@ -1169,6 +1169,63 @@ function ExplorerContent() {
                   : "Offres et circuits des profils que vous suivez"}
               </p>
             </div>
+
+            {/* ── Stories : accès rapide visuel aux offres et circuits ── */}
+            {!recoLoading && exploreOffers.length + exploreCircuits.length > 0 && (
+              <div className="mb-6">
+                <div
+                  className="flex gap-4 overflow-x-auto pb-2"
+                  style={{ scrollbarWidth: "none" }}
+                >
+                  {[
+                    ...exploreOffers.map((offre) => ({
+                      id: offre.id,
+                      titre: offre.title,
+                      image: offre.images?.[0] ?? null,
+                      genre: "Offre",
+                      ouvrir: () => openDetail(asFeedItem(offre, "offer")),
+                    })),
+                    ...exploreCircuits.map((circuit) => ({
+                      id: circuit.id,
+                      titre: circuit.title,
+                      image: circuit.cover_image,
+                      genre: "Circuit",
+                      ouvrir: () => openDetail(asFeedItem(circuit, "circuit")),
+                    })),
+                  ].map((story) => (
+                    <button
+                      key={`${story.genre}-${story.id}`}
+                      type="button"
+                      onClick={story.ouvrir}
+                      title={story.titre}
+                      className="group flex w-16 shrink-0 flex-col items-center gap-1.5"
+                    >
+                      <span className="rounded-full bg-gradient-to-tr from-primary to-emerald-400 p-[2px]">
+                        <span className="block rounded-full bg-white p-[2px] dark:bg-slate-900">
+                          {story.image ? (
+                            <img
+                              src={story.image}
+                              alt=""
+                              loading="lazy"
+                              className="h-14 w-14 rounded-full object-cover transition-transform group-hover:scale-105"
+                            />
+                          ) : (
+                            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/15 text-primary">
+                              <span className="material-symbols-outlined text-xl">
+                                {story.genre === "Circuit" ? "route" : "storefront"}
+                              </span>
+                            </span>
+                          )}
+                        </span>
+                      </span>
+                      <span className="w-16 truncate text-center text-[10px] font-semibold text-slate-600 dark:text-slate-300">
+                        {story.titre}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* ── Pour vous / À découvrir (recommendations) ── */}
             {(recoLoading || exploreOffers.length > 0 || exploreCircuits.length > 0) && (

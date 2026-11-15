@@ -123,6 +123,35 @@ export default function PlaceDetailPage() {
               )}
             </div>
 
+            {/* Galerie complète : le carrousel n'affiche qu'une photo à la fois,
+                cette grille rend visibles toutes les photos du lieu. */}
+            {lieu.images && lieu.images.length > 1 && (
+              <div className="px-6 md:px-8 pt-6">
+                <p className="text-[10px] font-black tracking-widest text-slate-400 uppercase mb-3">
+                  Toutes les photos ({lieu.images.length})
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {lieu.images.map((photo, i) => (
+                    <a
+                      key={`${photo}-${i}`}
+                      href={photo}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="relative block aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 group"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={photo}
+                        alt={`${lieu.place_name ?? "Lieu"} — photo ${i + 1}`}
+                        loading="lazy"
+                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Description + carte */}
             <div className="px-6 md:px-8 py-6 space-y-6">
               {lieu.description && (

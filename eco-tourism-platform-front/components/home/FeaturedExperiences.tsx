@@ -111,11 +111,24 @@ export default function FeaturedExperiences() {
       // Une seule carte par photo, par partenaire et par région : sans cela la
       // grille répétait la même image (9 offres partagent une couverture) et
       // trois fiches voisines remplissaient la moitié de l'écran.
+      // Rotation quotidienne : le classement reste le même, mais la vitrine ne
+      // montre plus éternellement les six mêmes fiches. On fait tourner le
+      // début des meilleures candidates chaque jour, sans descendre dans les
+      // fiches mal documentées.
+      const pool = retenues.slice(0, 15);
+      const jour = Math.floor(Date.now() / 86_400_000);
+      const decalage = pool.length ? (jour * 6) % pool.length : 0;
+      const ordonnees = [
+        ...pool.slice(decalage),
+        ...pool.slice(0, decalage),
+        ...retenues.slice(15),
+      ];
+
       const photos = new Set<string>();
       const orgs = new Set<string>();
       const regions = new Map<string, number>();
       const vitrine: Carte[] = [];
-      for (const c of retenues) {
+      for (const c of ordonnees) {
         const photo = clePhoto(c.image);
         if (photo && photos.has(photo)) continue;
 
