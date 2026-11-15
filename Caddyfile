@@ -1,0 +1,23 @@
+admin@ecovoyage.duckdns.org {
+
+}
+
+http://adventures.tn, http://www.adventures.tn {
+    encode zstd gzip
+    handle /api/* {
+        reverse_proxy 127.0.0.1:3003
+    }
+    handle {
+        reverse_proxy 127.0.0.1:3004
+    }
+}
+
+ecovoyage.duckdns.org {
+    encode zstd gzip
+    handle /api/* {
+        reverse_proxy 127.0.0.1:3003
+    }
+    handle {
+        reverse_proxy 127.0.0.1:3004
+    }
+}

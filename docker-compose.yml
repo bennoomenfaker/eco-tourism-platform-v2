@@ -31,7 +31,7 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     ports:
-      - "3001:3000"
+      - "3003:3000"
     env_file:
       - ./backend/.env.production
     depends_on:
@@ -46,21 +46,44 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: http://91.134.139.163:3001/api
+        NEXT_PUBLIC_API_URL: http://91.134.139.163:3003/api
     restart: unless-stopped
     ports:
-      - "3002:3000"
+      - "3004:3000"
     depends_on:
       - api
     networks:
       - tourisme_net
 
+  # ── Traefik ─────────────────────────────────────────────────────────────────
+  traefik:
+    image: traefik:v3.0
+    restart: unless-stopped
+    command:
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.letsencrypt.acme.email=admin@ecovoyage.duckdns.org
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt.json
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - tourism_net
+    volumes:
+      - traefik_acme:/letsencrypt.json
+
 # ── Networks ──────────────────────────────────────────────────────────────────
 networks:
-  tourisme_net:
+  tourism_net:
     external: true
+    internal: true
 
 # ── Volumes ───────────────────────────────────────────────────────────────────
 volumes:
   tourisme_pgdata:
   tourisme_mongodata:
+  traefik_acme:
+    external: false
