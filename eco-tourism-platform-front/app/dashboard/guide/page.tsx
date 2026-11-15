@@ -264,13 +264,13 @@ function GuideDashboardContent() {
 
         {/* ── Sidebar ─────────────────────────────────────────────────────── */}
         <DashboardSidebar>
-          <div className="px-4 py-4 flex flex-col h-full">
-            <div className="flex items-center gap-3 mb-5">
+          <div className="p-6 flex flex-col h-full">
+            <div className="flex items-center gap-3 mb-10">
               <Leaf className="text-primary w-8 h-8" />
               <h1 className="text-xl font-extrabold tracking-tight">Éco-Voyage</h1>
             </div>
 
-            <nav className="flex-1 space-y-0.5">
+            <nav className="flex-1 space-y-1">
               {navItems.map((item) => (
                 <button
                   key={item.label}
@@ -292,7 +292,7 @@ function GuideDashboardContent() {
                     }
                     router.push(item.href!);
                   }}
-                  className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-sm transition-all ${
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                     activeItem === item.label
                       ? "bg-primary/10 text-primary font-bold"
                       : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
@@ -304,7 +304,7 @@ function GuideDashboardContent() {
               ))}
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
               >
                 <span className="material-symbols-outlined">logout</span>
                 <span>Déconnexion</span>
@@ -312,7 +312,7 @@ function GuideDashboardContent() {
             </nav>
 
             {profile && (
-              <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800">
+              <div className="mt-auto pt-6 border-t border-slate-100 dark:border-slate-800">
                 <div className="flex justify-between items-center mb-2">
                   <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Profil complété</p>
                   <p className="text-xs font-extrabold text-primary">{profile.profile_completion}%</p>
