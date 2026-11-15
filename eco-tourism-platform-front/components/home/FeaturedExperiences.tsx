@@ -15,15 +15,31 @@ function liste(v: any): any[] {
   return Array.isArray(v) ? v : (v?.data ?? v?.items ?? []);
 }
 
-/** Photo réelle hébergée par nous (Cloudinary), par opposition à un visuel de secours. */
-function photoReelle(url: unknown): boolean {
-  return typeof url === "string" && url.includes("res.cloudinary.com");
+/**
+ * Qualité de l'image de couverture, de 0 (à écarter) à 5.
+ * La vitrine est le premier écran vu par un visiteur : on n'y met que des
+ * photos réellement servies par nous, assez larges pour une carte de 400 px.
+ */
+function qualiteImage(url: unknown): number {
+  if (typeof url !== "string" || !url) return 0;
+  // Visuels de secours, images par défaut des démos : jamais en vitrine.
+  if (/placeholder|no-?image|default\.(jpe?g|png)|via\.placeholder/i.test(url)) return 0;
+  let q = 1;
+  if (url.includes("res.cloudinary.com")) q += 2; // hébergée par nous, servie en cache CDN
+  if (/\/t_eco_1600\//.test(url)) q += 1; // transformation large : nette sur grand écran
+  if (/\.(jpe?g|webp|avif)(\?|$)/i.test(url)) q += 1; // format photographique
+  if (/[\/_-]w_(\d{1,3})(?![0-9])/.test(url)) q -= 1; // vignette trop petite
+  return q;
 }
 
-/** Rang de mise en avant : 0 = fiche d'hébergement réelle, 2 = le reste. */
-function rang(carte: Carte, offre: any | null): number {
-  if (!photoReelle(carte.image)) return 2;
-  return offre?.offer_type === "hebergement" ? 0 : 1;
+/** Deux cartes ne doivent jamais montrer la même photo. */
+function clePhoto(url: string | null): string | null {
+  return url ? url.split("?")[0].split("/").pop() ?? url : null;
+}
+
+/** Fiche complète : prix affichable et score de durabilité renseignés. */
+function completude(carte: Carte): number {
+  return (carte.price != null ? 1 : 0) + (carte.score != null ? 1 : 0);
 }
 
 /**
@@ -76,31 +92,47 @@ export default function FeaturedExperiences() {
         brut: c,
       }));
 
-      // Vitrine : les fiches d'hébergement réelles d'abord (Matmata, Dar El
-      // Margoum, Toujane…), puis les offres les mieux notées. Un classement
-      // au seul score mettait en tête les fiches de démonstration.
-      const retenues = [...cartesOffres, ...cartesCircuits].filter(
-        (c) => !(c.kind === "offer" && OFFRES_MASQUEES.has(c.id)),
-      );
+      // Vitrine : uniquement des fiches dont la photo est exploitable, les
+      // mieux documentées d'abord (prix + score), puis les mieux notées.
+      const retenues = [...cartesOffres, ...cartesCircuits]
+        .filter((c) => !(c.kind === "offer" && OFFRES_MASQUEES.has(c.id)))
+        .filter((c) => qualiteImage(c.image) > 0)
+        .sort((a, b) => {
+          const qa = qualiteImage(a.image);
+          const qb = qualiteImage(b.image);
+          if (qa !== qb) return qb - qa;
+          const ca = completude(a);
+          const cb = completude(b);
+          if (ca !== cb) return cb - ca;
+          const score = (b.score ?? -1) - (a.score ?? -1);
+          return score !== 0 ? score : a.title.localeCompare(b.title, "fr");
+        });
 
-      setCartes(
-        retenues
-          .sort((a, b) => {
-            const ra = rang(a, a.kind === "offer" ? a.brut : null);
-            const rb = rang(b, b.kind === "offer" ? b.brut : null);
-            if (ra !== rb) return ra - rb;
-            const score = (b.score ?? -1) - (a.score ?? -1);
-            return score !== 0 ? score : a.title.localeCompare(b.title, "fr");
-          })
-          // Un même partenaire n'occupe qu'une carte : sans cela, une seule
-          // organisation peut remplir toute la vitrine avec ses variantes.
-          .filter((c, i, toutes) => {
-            const org = c.kind === "offer" ? (c.brut?.organization_id ?? null) : null;
-            if (!org) return true;
-            return toutes.findIndex((t) => t.kind === "offer" && t.brut?.organization_id === org) === i;
-          })
-          .slice(0, 6),
-      );
+      // Une seule carte par photo, par partenaire et par région : sans cela la
+      // grille répétait la même image (9 offres partagent une couverture) et
+      // trois fiches voisines remplissaient la moitié de l'écran.
+      const photos = new Set<string>();
+      const orgs = new Set<string>();
+      const regions = new Map<string, number>();
+      const vitrine: Carte[] = [];
+      for (const c of retenues) {
+        const photo = clePhoto(c.image);
+        if (photo && photos.has(photo)) continue;
+
+        const org = c.kind === "offer" ? (c.brut?.organization_id ?? null) : null;
+        if (org && orgs.has(org)) continue;
+
+        const region = (c.location ?? "").trim();
+        if (region && (regions.get(region) ?? 0) >= 2) continue;
+
+        if (photo) photos.add(photo);
+        if (org) orgs.add(org);
+        if (region) regions.set(region, (regions.get(region) ?? 0) + 1);
+        vitrine.push(c);
+        if (vitrine.length === 6) break;
+      }
+
+      setCartes(vitrine);
     })();
   }, []);
 
