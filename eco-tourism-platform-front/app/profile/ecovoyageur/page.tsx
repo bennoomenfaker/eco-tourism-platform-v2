@@ -397,7 +397,7 @@ function EcoTravelerProfilePageContent({ embedded = false, forcedTab, openEditOn
 
   const scoreLabel = (score: number | null) => {
     if (score === null) return "Éco-Voyageur";
-    if (score >= 80) return "Ambassadeur Éco Voyage";
+    if (score >= 80) return "Ambassadeur Adventures.tn";
     if (score >= 60) return "Explorateur Engagé";
     if (score >= 40) return "Voyageur Sensible";
     return "Voyageur Éco-Débutant";
@@ -927,7 +927,7 @@ function EcoTravelerProfilePageContent({ embedded = false, forcedTab, openEditOn
           </button>
           <div className="flex items-center gap-2 text-slate-900">
             <Leaf className="text-primary w-6 h-6" />
-            <span className="text-base font-extrabold tracking-tight">Éco-Voyage</span>
+            <span className="text-base font-extrabold tracking-tight">Adventures.tn</span>
           </div>
         </div>
       </div>

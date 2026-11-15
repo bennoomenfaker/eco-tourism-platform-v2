@@ -250,7 +250,7 @@ export default function AfratimImpactPage() {
               Notre impact
             </h1>
             <p className="text-lg text-emerald-100 max-w-2xl mx-auto leading-relaxed">
-              Éco-Voyage s&apos;inscrit dans les Objectifs de Développement Durable des Nations Unies pour un tourisme responsable et durable.
+              Adventures.tn s&apos;inscrit dans les Objectifs de Développement Durable des Nations Unies pour un tourisme responsable et durable.
             </p>
           </motion.div>
         </div>
@@ -399,7 +399,7 @@ export default function AfratimImpactPage() {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeIn}>
             <h2 className="text-3xl font-extrabold text-slate-800 mb-4">Notre engagement</h2>
             <p className="text-slate-500 mb-8 max-w-xl mx-auto leading-relaxed">
-              Chaque réservation, chaque circuit, chaque projet sur Éco-Voyage contribue à un avenir plus durable.
+              Chaque réservation, chaque circuit, chaque projet sur Adventures.tn contribue à un avenir plus durable.
               Ensemble, nous construisons un tourisme responsable qui respecte les personnes et la planète.
             </p>
             <button

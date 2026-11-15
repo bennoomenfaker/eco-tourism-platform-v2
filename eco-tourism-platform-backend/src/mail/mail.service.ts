@@ -23,7 +23,7 @@ export class MailService {
             html: `
         <div style="font-family:Arial,sans-serif">
           <h2>Réinitialisation de mot de passe</h2>
-          <p>Vous avez demandé à réinitialiser votre mot de passe sur Éco-Voyage.</p>
+          <p>Vous avez demandé à réinitialiser votre mot de passe sur Adventures.tn.</p>
           <p>Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe :</p>
           <p>
             <a href="${resetUrl}" style="display:inline-block;padding:12px 20px;background:#22c55e;color:#000;text-decoration:none;border-radius:8px;font-weight:bold;">
@@ -64,16 +64,16 @@ export class MailService {
         await this.transporter.sendMail({
             from: process.env.MAIL_FROM || process.env.SMTP_USER,
             to: email,
-            subject: 'Avertissement concernant votre compte Éco-Voyage',
+            subject: 'Avertissement concernant votre compte Adventures.tn',
             html: `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
           <h2 style="color:#f97316">⚠️ Avertissement officiel</h2>
           <p>Bonjour <strong>${name}</strong>,</p>
-          <p>Suite à un signalement concernant votre comportement sur la plateforme Éco-Voyage, notre équipe de modération vous adresse cet avertissement officiel.</p>
+          <p>Suite à un signalement concernant votre comportement sur la plateforme Adventures.tn, notre équipe de modération vous adresse cet avertissement officiel.</p>
           <p><strong>Motif du signalement :</strong> ${reason}</p>
           ${note ? `<p><strong>Note de l'administrateur :</strong> ${note}</p>` : ''}
           <p>Nous vous invitons à respecter les règles de la communauté. En cas de récidive, des mesures plus sévères pourront être prises.</p>
-          <p style="color:#888;font-size:12px;">Éco-Voyage — Service de modération</p>
+          <p style="color:#888;font-size:12px;">Adventures.tn — Service de modération</p>
         </div>`,
         });
     }
@@ -83,7 +83,7 @@ export class MailService {
         await this.transporter.sendMail({
             from: process.env.MAIL_FROM || process.env.SMTP_USER,
             to: email,
-            subject: 'Votre profil Éco-Voyage a été refusé',
+            subject: 'Votre profil Adventures.tn a été refusé',
             html: `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
           <h2 style="color:#ef4444">Profil refusé</h2>
@@ -95,7 +95,7 @@ export class MailService {
             Passé ce délai, vous ne pourrez plus vous connecter.
           </p>
           <p>Si vous pensez qu'il s'agit d'une erreur, contactez notre support avant l'expiration de ce délai.</p>
-          <p style="color:#888;font-size:12px;">Éco-Voyage — Service de modération</p>
+          <p style="color:#888;font-size:12px;">Adventures.tn — Service de modération</p>
         </div>`,
         });
     }
@@ -107,16 +107,16 @@ export class MailService {
         await this.transporter.sendMail({
             from: process.env.MAIL_FROM || process.env.SMTP_USER,
             to: email,
-            subject: 'Votre compte Éco-Voyage a été suspendu',
+            subject: 'Votre compte Adventures.tn a été suspendu',
             html: `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
           <h2 style="color:#ef4444">🚫 Compte suspendu</h2>
           ${name ? `<p>Bonjour <strong>${name}</strong>,</p>` : ''}
-          <p>Votre compte sur la plateforme Éco-Voyage a été suspendu ${durationText} suite à une violation de nos règles d'utilisation.</p>
+          <p>Votre compte sur la plateforme Adventures.tn a été suspendu ${durationText} suite à une violation de nos règles d'utilisation.</p>
           ${note ? `<p><strong>Raison :</strong> ${note}</p>` : ''}
           ${banDays > 0 ? `<p>Votre accès sera automatiquement rétabli après la période de suspension.</p>` : ''}
           <p>Si vous pensez qu'il s'agit d'une erreur, veuillez contacter notre support.</p>
-          <p style="color:#888;font-size:12px;">Éco-Voyage — Service de modération</p>
+          <p style="color:#888;font-size:12px;">Adventures.tn — Service de modération</p>
         </div>`,
         });
     }
@@ -125,13 +125,13 @@ export class MailService {
         await this.transporter.sendMail({
             from: process.env.MAIL_FROM || process.env.SMTP_USER,
             to: email,
-            subject: 'Votre compte Éco-Voyage a été rétabli',
+            subject: 'Votre compte Adventures.tn a été rétabli',
             html: `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
           <h2 style="color:#22c55e">✅ Compte rétabli</h2>
-          <p>Votre compte sur la plateforme Éco-Voyage a été <strong>rétabli</strong>. Vous pouvez à nouveau vous connecter.</p>
+          <p>Votre compte sur la plateforme Adventures.tn a été <strong>rétabli</strong>. Vous pouvez à nouveau vous connecter.</p>
           <p>Nous vous rappelons l'importance de respecter les règles de notre communauté.</p>
-          <p style="color:#888;font-size:12px;">Éco-Voyage — Service de modération</p>
+          <p style="color:#888;font-size:12px;">Adventures.tn — Service de modération</p>
         </div>`,
         });
     }
@@ -147,7 +147,7 @@ export class MailService {
         await this.transporter.sendMail({
             from: process.env.MAIL_FROM || process.env.SMTP_USER,
             to: reporterEmail,
-            subject: 'Résultat de votre signalement — Éco-Voyage',
+            subject: 'Résultat de votre signalement — Adventures.tn',
             html: `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
           <h2 style="color:#22c55e">✅ Votre signalement a été traité</h2>
@@ -156,7 +156,7 @@ export class MailService {
           <p><strong>Décision :</strong> Le compte de <strong>${reportedName}</strong> ${label}.</p>
           ${note ? `<p><strong>Note :</strong> ${note}</p>` : ''}
           <p>Nous prenons la sécurité de notre communauté très au sérieux et vous remercions de contribuer à un environnement sain.</p>
-          <p style="color:#888;font-size:12px;">Éco-Voyage — Service de modération</p>
+          <p style="color:#888;font-size:12px;">Adventures.tn — Service de modération</p>
         </div>`,
         });
     }

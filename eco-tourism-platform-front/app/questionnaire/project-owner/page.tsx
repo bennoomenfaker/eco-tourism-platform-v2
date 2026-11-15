@@ -60,7 +60,7 @@ const OWNER_MESSAGES: Record<string, string> = {
   "Ambassadeur durable": "Félicitations ! Votre projet est un modèle d'éco-tourisme responsable en Tunisie.",
   "Écovoyageur engagé": "Excellent ! Votre projet affiche un très haut niveau de responsabilité durable.",
   "Voyageur sensible": "Bien ! Votre projet intègre de bonnes pratiques éco-responsables.",
-  "Voyageur classique": "La plateforme Éco-Voyage vous accompagnera pour renforcer la durabilité de votre projet.",
+  "Voyageur classique": "La plateforme Adventures.tn vous accompagnera pour renforcer la durabilité de votre projet.",
 };
 
 function getScoreProfile(score: number): string {
@@ -118,7 +118,7 @@ function ScoreCard({ result }: { result: ScoreResult }) {
       <div className="w-full max-w-md p-5 bg-primary/10 rounded-2xl border border-primary/20 mb-8 text-left">
         <p className="text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
           <span className="material-symbols-outlined text-primary text-base">info</span>
-          La plateforme Éco-Voyage utilisera vos réponses pour :
+          La plateforme Adventures.tn utilisera vos réponses pour :
         </p>
         <ul className="text-sm text-slate-600 space-y-1 font-medium">
           <li>• Valoriser votre projet auprès des voyageurs éco-responsables</li>

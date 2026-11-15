@@ -116,7 +116,7 @@ function ScoreCard({ result }: { result: ScoreResult }) {
             <div className="w-full max-w-md p-5 bg-primary/10 rounded-2xl border border-primary/20 mb-8 text-left">
                 <p className="text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
                     <span className="material-symbols-outlined text-primary text-base">info</span>
-                    La plateforme Éco-Voyage utilisera vos réponses pour :
+                    La plateforme Adventures.tn utilisera vos réponses pour :
                 </p>
                 <ul className="text-sm text-slate-600 space-y-1 font-medium">
                     <li>• Vous recommander des expériences adaptées</li>

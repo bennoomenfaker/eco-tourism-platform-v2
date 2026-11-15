@@ -157,7 +157,7 @@ function getScoreLabel(score: number | null, role: string): string {
     return "Guide en Développement";
   }
   if (role === "eco_traveler") {
-    if (score >= 80) return "Ambassadeur Éco-Voyage";
+    if (score >= 80) return "Ambassadeur Adventures.tn";
     if (score >= 60) return "Voyageur Éco-Responsable";
     if (score >= 40) return "Voyageur Engagé";
     return "Voyageur Éco-Débutant";
@@ -989,7 +989,7 @@ function ExplorerContent() {
           <div className="p-6 flex flex-col h-full">
             <div className="-mt-2 mb-6 flex items-center gap-3">
               <Leaf className="text-primary w-8 h-8" />
-              <h1 className="text-xl font-extrabold tracking-tight">Éco-Voyage</h1>
+              <h1 className="text-xl font-extrabold tracking-tight">Adventures.tn</h1>
             </div>
 
             <nav className="flex-1 space-y-1">

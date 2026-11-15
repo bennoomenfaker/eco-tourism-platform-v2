@@ -182,7 +182,7 @@ const OFFER_TYPES = [
 ];
 
 function getOfferSustainabilityLevel(score: number) {
-  if (score >= 86) return { label: "Offre Ambassadrice Éco Voyage", color: "text-primary",      emoji: "⭐" };
+  if (score >= 86) return { label: "Offre Ambassadrice Adventures.tn", color: "text-primary",      emoji: "⭐" };
   if (score >= 71) return { label: "Offre Éco-Responsable",         color: "text-emerald-600", emoji: "🌿" };
   if (score >= 51) return { label: "Offre Engagée",                 color: "text-teal-600",    emoji: "🤝" };
   if (score >= 31) return { label: "Offre Sensibilisée",            color: "text-secondary",   emoji: "💡" };
@@ -231,7 +231,7 @@ function scoreColor(score: number) {
 }
 
 function scoreLabel(score: number | null) {
-  if (score === null) return "Guide Éco-Voyage";
+  if (score === null) return "Guide Adventures.tn";
   if (score >= 80) return "Guide Ambassadeur";
   if (score >= 60) return "Guide Éco-Responsable";
   if (score >= 40) return "Guide Engagé";
@@ -509,7 +509,7 @@ export default function PublicGuideProfile() {
           </button>
           <div className="flex items-center gap-2 text-slate-900">
             <Leaf className="text-primary w-6 h-6" />
-            <span className="text-base font-extrabold tracking-tight">Éco-Voyage</span>
+            <span className="text-base font-extrabold tracking-tight">Adventures.tn</span>
           </div>
         </div>
       </div>

@@ -80,7 +80,7 @@ export class UpdateGuideExperienceDto {
   @IsString({ each: true })
   landscapes!: string[];
 
-  @ApiProperty({ example: [{ label: 'Guide certifié Éco-Voyage', proof: 'https://...' }] })
+  @ApiProperty({ example: [{ label: 'Guide certifié Adventures.tn', proof: 'https://...' }] })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CertificationDto)

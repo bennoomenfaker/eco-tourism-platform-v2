@@ -337,7 +337,7 @@ export default function RegisterPage() {
       <footer className="w-full py-8 mt-auto">
         <div className="flex flex-col md:flex-row justify-center items-center gap-6 px-8">
           <span className="font-manrope text-xs font-medium text-slate-500 dark:text-slate-400">
-            © 2024 Éco-Voyage. Tous droits réservés.
+            © 2024 Adventures.tn. Tous droits réservés.
           </span>
           <div className="flex gap-6">
             <Link

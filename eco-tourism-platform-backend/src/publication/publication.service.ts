@@ -19,7 +19,7 @@ import { macrosOfTags } from '../common/constants/taxonomy';
 import { PlaceContribution } from '../place-contribution/entities/place-contribution.entity';
 import { PublicationShare } from './entities/publication-share.entity';
 
-const AMBASSADOR_BADGE = 'Ambassadeur Éco-Voyage';
+const AMBASSADOR_BADGE = 'Ambassadeur Adventures.tn';
 
 @Injectable()
 export class PublicationService {

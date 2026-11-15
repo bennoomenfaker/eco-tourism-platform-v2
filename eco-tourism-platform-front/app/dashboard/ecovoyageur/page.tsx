@@ -56,7 +56,7 @@ type EcoProfile = {
   profile_completion: number;
   is_onboarded: boolean;
 
-  // Score final + 4 composants (spec Éco-Voyage)
+  // Score final + 4 composants (spec Adventures.tn)
   sustainability_score: number | null;
   score_questionnaire: number | null;  // 20%
   score_reservations: number;          // 40%
@@ -176,7 +176,7 @@ function EcoVoyageurDashboardContent() {
           <div className="p-6 flex flex-col h-full">
             <div className="flex items-center gap-3 mb-10">
               <Leaf className="text-primary w-8 h-8" />
-              <h1 className="text-xl font-extrabold tracking-tight">Éco-Voyage</h1>
+              <h1 className="text-xl font-extrabold tracking-tight">Adventures.tn</h1>
             </div>
 
             <nav className="flex-1 space-y-1">

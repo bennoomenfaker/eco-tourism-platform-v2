@@ -1624,7 +1624,7 @@ function DashboardContent() {
           <div className="p-6 flex flex-col h-full">
             <div className="flex items-center gap-3 mb-10">
               <Leaf className="text-primary w-8 h-8" />
-              <h1 className="text-xl font-extrabold tracking-tight">Éco-Voyage</h1>
+              <h1 className="text-xl font-extrabold tracking-tight">Adventures.tn</h1>
             </div>
 
             <nav className="flex-1 space-y-1">
@@ -1923,7 +1923,7 @@ function DashboardContent() {
                           : "Aucun motif n'a été précisé."}
                       </p>
                       <p className="text-sm text-red-600 font-medium mt-1">
-                        Votre compte sera désactivé sous 24h. Contactez l&apos;équipe Éco-Voyage avant ce délai.
+                        Votre compte sera désactivé sous 24h. Contactez l&apos;équipe Adventures.tn avant ce délai.
                       </p>
                     </div>
                   </div>
@@ -1936,7 +1936,7 @@ function DashboardContent() {
                     <div>
                       <p className="font-bold text-amber-800">Profil en attente de validation</p>
                       <p className="text-sm text-amber-600 font-medium">
-                        L&apos;équipe Éco-Voyage va examiner votre profil sous 48h. Vous pourrez publier vos offres et vos circuits dès qu&apos;il sera validé.
+                        L&apos;équipe Adventures.tn va examiner votre profil sous 48h. Vous pourrez publier vos offres et vos circuits dès qu&apos;il sera validé.
                       </p>
                     </div>
                   </div>

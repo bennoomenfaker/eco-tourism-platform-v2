@@ -56,7 +56,7 @@ function ResetPasswordForm() {
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-8">
           <Leaf className="text-primary w-8 h-8" />
-          <span className="text-xl font-extrabold tracking-tight">Éco-Voyage</span>
+          <span className="text-xl font-extrabold tracking-tight">Adventures.tn</span>
         </div>
 
         <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-8">

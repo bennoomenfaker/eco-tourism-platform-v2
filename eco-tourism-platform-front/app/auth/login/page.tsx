@@ -214,7 +214,7 @@ function LoginForm() {
               </div>
 
               <p className="mt-10 text-center text-sm font-medium text-on-surface-variant">
-                Nouveau sur Éco-Voyage ?
+                Nouveau sur Adventures.tn ?
                 <Link
                   href="/auth/register"
                   className="text-primary font-bold hover:underline ml-1"
@@ -231,7 +231,7 @@ function LoginForm() {
       <footer className="w-full py-8 mt-auto bg-transparent">
         <div className="flex flex-col md:flex-row justify-center items-center gap-6 px-8 font-manrope text-xs font-medium text-slate-500 dark:text-slate-400">
           <span className="text-slate-400">
-            © 2024 Éco-Voyage. Tous droits réservés.
+            © 2024 Adventures.tn. Tous droits réservés.
           </span>
           <div className="flex gap-6">
             <Link href="#" className="hover:text-primary transition-colors cursor-pointer">

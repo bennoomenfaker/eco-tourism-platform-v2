@@ -359,7 +359,7 @@ function ProofInput({ proof, onChange }: { proof: string; onChange: (v: string) 
 }
 
 const CERTIFICATIONS_LIST = [
-  "Guide certifié Éco-Voyage",
+  "Guide certifié Adventures.tn",
   "Premiers secours (PSC1)",
   "Guide de montagne agréé",
   "Formation éco-tourisme",
@@ -494,7 +494,7 @@ function GuideProfilePageContent({ embedded = false, forcedTab, openEditOnMount 
     if (status === "active") return false;
     alert(
       status === "rejected"
-        ? "Votre profil a été refusé. Contactez l'équipe Éco-Voyage pour le régulariser."
+        ? "Votre profil a été refusé. Contactez l'équipe Adventures.tn pour le régulariser."
         : "Votre profil doit être validé par un administrateur avant de créer une offre ou un circuit. La validation intervient sous 48h.",
     );
     return true;
@@ -1289,7 +1289,7 @@ function GuideProfilePageContent({ embedded = false, forcedTab, openEditOnMount 
           </button>
           <div className="flex items-center gap-2 text-slate-900">
             <Leaf className="text-primary w-6 h-6" />
-            <span className="text-base font-extrabold tracking-tight">Éco-Voyage</span>
+            <span className="text-base font-extrabold tracking-tight">Adventures.tn</span>
           </div>
         </div>
       </div>
@@ -2858,7 +2858,7 @@ function GuideProfilePageContent({ embedded = false, forcedTab, openEditOnMount 
                         style={{ width: `${profile.sustainability_score}%` }} />
                     </div>
                     <p className="text-xs font-bold text-slate-500 mt-2">
-                      {profile.sustainability_score >= 80 ? "Guide Ambassadeur Éco Voyage"
+                      {profile.sustainability_score >= 80 ? "Guide Ambassadeur Adventures.tn"
                         : scoreLabel(profile.sustainability_score)}
                     </p>
                   </div>

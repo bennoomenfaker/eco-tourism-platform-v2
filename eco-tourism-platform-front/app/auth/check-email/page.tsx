@@ -9,7 +9,7 @@ export default function CheckEmailPage() {
       <div className="w-full max-w-md rounded-2xl bg-white shadow-xl p-8 border border-slate-200 text-center">
         <div className="flex items-center justify-center gap-2 mb-6">
           <Leaf className="text-primary w-7 h-7" />
-          <span className="text-xl font-extrabold tracking-tight">Éco-Voyage</span>
+          <span className="text-xl font-extrabold tracking-tight">Adventures.tn</span>
         </div>
         <h1 className="text-2xl font-extrabold mb-4 text-slate-900">
           Vérifiez votre email

@@ -244,7 +244,7 @@ const SUSTAINABILITY_STEPS = [
 ];
 
 function getSustainabilityLevel(score: number) {
-  if (score >= 86) return { label: "Projet Ambassadeur Éco Voyage", color: "text-primary", bg: "bg-primary/10", emoji: "⭐" };
+  if (score >= 86) return { label: "Projet Ambassadeur Adventures.tn", color: "text-primary", bg: "bg-primary/10", emoji: "⭐" };
   if (score >= 71) return { label: "Projet Éco-Responsable",        color: "text-emerald-600", bg: "bg-emerald-50", emoji: "🌿" };
   if (score >= 51) return { label: "Projet Engagé",                 color: "text-teal-600",   bg: "bg-teal-50",    emoji: "🤝" };
   if (score >= 31) return { label: "Projet Sensibilisé",            color: "text-blue-600",   bg: "bg-blue-50",    emoji: "💡" };
@@ -1255,7 +1255,7 @@ export default function ProjectOwnerProfilePage({ embedded = false, forcedTab, o
           </button>
           <div className="flex items-center gap-2 text-slate-900">
             <Leaf className="text-primary w-6 h-6" />
-            <span className="text-base font-extrabold tracking-tight">Éco-Voyage</span>
+            <span className="text-base font-extrabold tracking-tight">Adventures.tn</span>
           </div>
         </div>
       </div>
@@ -1428,7 +1428,7 @@ export default function ProjectOwnerProfilePage({ embedded = false, forcedTab, o
                   <label className="text-[10px] font-black tracking-widest text-slate-400 uppercase mb-1.5 block">Entreprise / Structure <span className="normal-case font-medium text-slate-300">(optionnel)</span></label>
                   <div className="relative">
                     <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xl">business</span>
-                    <input type="text" placeholder="Éco-Voyage, Éco-Lodge Djerba…"
+                    <input type="text" placeholder="Adventures.tn, Éco-Lodge Djerba…"
                       value={editProfileForm.organization}
                       onChange={(e) => setEditProfileForm((f) => ({ ...f, organization: e.target.value }))}
                       className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white"
@@ -3161,7 +3161,7 @@ export default function ProjectOwnerProfilePage({ embedded = false, forcedTab, o
                         style={{ width: `${profile.sustainability_score}%` }} />
                     </div>
                     <p className="text-xs font-bold text-slate-500 mt-2">
-                      {profile.sustainability_score >= 80 ? "Prestataire Ambassadeur Éco Voyage" : scoreLabel(profile.sustainability_score)}
+                      {profile.sustainability_score >= 80 ? "Prestataire Ambassadeur Adventures.tn" : scoreLabel(profile.sustainability_score)}
                     </p>
                   </div>
                 )}
