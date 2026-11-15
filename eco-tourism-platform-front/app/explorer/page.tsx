@@ -784,6 +784,8 @@ function ExplorerContent() {
   }, []);
 
   const [orgLogo, setOrgLogo] = useState<string | null>(null);
+  /** Recherche locale du bandeau : elle filtre les sections de la page. */
+  const [recherche, setRecherche] = useState("");
 
   /* ── Auth + profile + notifications ── */
   useEffect(() => {
@@ -957,6 +959,18 @@ function ExplorerContent() {
     ...latestCircuits.filter((c) => !seenCircuitIds.has(c.id)),
   ].slice(0, 6);
 
+  // Filtrage des deux sections par la recherche du bandeau : titre,
+  // description et région. Entrée ouvre la recherche complète de /destinations.
+  const terme = recherche.trim().toLowerCase();
+  const correspond = (valeurs: (string | null | undefined)[]) =>
+    valeurs.some((v) => (v ?? "").toLowerCase().includes(terme));
+  const offresAffichees = terme
+    ? exploreOffers.filter((o) => correspond([o.title, o.description, o.region]))
+    : exploreOffers;
+  const circuitsAffiches = terme
+    ? exploreCircuits.filter((c) => correspond([c.title, c.description]))
+    : exploreCircuits;
+
   function asFeedItem(item: OfferFeed | CircuitFeed, type: "offer" | "circuit"): FeedItem {
     return { type, id: item.id, created_at: item.created_at, data: item } as FeedItem;
   }
@@ -1033,9 +1047,25 @@ function ExplorerContent() {
                 <input
                   className="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl py-3 pl-12 pr-4 text-sm focus:ring-2 focus:ring-primary/50"
                   placeholder="Rechercher une offre, un circuit…"
-                  onKeyDown={(e) => e.key === "Enter" && router.push("/destinations")}
+                  value={recherche}
+                  onChange={(e) => setRecherche(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key !== "Enter") return;
+                    router.push(
+                      recherche.trim() ? `/destinations?q=${encodeURIComponent(recherche.trim())}` : "/destinations",
+                    );
+                  }}
                 />
                 <span className="material-symbols-outlined absolute left-4 top-3 text-slate-400 text-xl">search</span>
+                {recherche && (
+                  <button
+                    onClick={() => setRecherche("")}
+                    aria-label="Effacer la recherche"
+                    className="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600"
+                  >
+                    <span className="material-symbols-outlined text-base">close</span>
+                  </button>
+                )}
               </div>
               <span className="truncate text-base font-bold md:hidden">Explorer</span>
             </div>
@@ -1224,8 +1254,28 @@ function ExplorerContent() {
               </div>
             )}
 
+            {/* Recherche sans résultat dans les deux sections */}
+            {!recoLoading &&
+              terme &&
+              offresAffichees.length === 0 &&
+              circuitsAffiches.length === 0 && (
+                <div className="mb-8 rounded-2xl border border-slate-200 bg-white p-6 text-center dark:border-slate-700 dark:bg-slate-900">
+                  <p className="text-sm font-semibold text-slate-500">
+                    Aucune offre ni circuit ne correspond à « {recherche.trim()} ».
+                  </p>
+                  <button
+                    onClick={() =>
+                      router.push(`/destinations?q=${encodeURIComponent(recherche.trim())}`)
+                    }
+                    className="mt-3 text-sm font-bold text-primary hover:underline"
+                  >
+                    Chercher dans tout le catalogue →
+                  </button>
+                </div>
+              )}
+
             {/* ── Pour vous / À découvrir (recommendations) ── */}
-            {(recoLoading || exploreOffers.length > 0 || exploreCircuits.length > 0) && (
+            {(recoLoading || offresAffichees.length > 0 || circuitsAffiches.length > 0) && (
               <div className="mb-8">
                 <div className="flex items-center gap-2 mb-4">
                   <Sparkles className="w-4 h-4 text-primary" />
@@ -1243,13 +1293,13 @@ function ExplorerContent() {
                   </div>
                 ) : (
                   <div className="space-y-8">
-                    {exploreOffers.length > 0 && (
+                    {offresAffichees.length > 0 && (
                       <section>
                         <div className="mb-3 flex items-center gap-2">
                           <span className="material-symbols-outlined text-lg text-primary">storefront</span>
                           <h4 className="text-xs font-extrabold uppercase tracking-widest text-slate-500">Offres</h4>
                           <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500 dark:bg-slate-800">
-                            {exploreOffers.length}
+                            {offresAffichees.length}
                           </span>
                         </div>
                         {/* Carrousel horizontal : les 6 offres restent sur une
@@ -1259,7 +1309,7 @@ function ExplorerContent() {
                           className="-mx-1 flex snap-x snap-mandatory gap-4 overflow-x-auto px-1 pb-2"
                           style={{ scrollbarWidth: "none" }}
                         >
-                          {exploreOffers.map((offer) => (
+                          {offresAffichees.map((offer) => (
                             <div
                               key={offer.id}
                               className="w-full shrink-0 snap-start sm:w-[320px]"
@@ -1274,17 +1324,17 @@ function ExplorerContent() {
                       </section>
                     )}
 
-                    {exploreCircuits.length > 0 && (
+                    {circuitsAffiches.length > 0 && (
                       <section>
                         <div className="mb-3 flex items-center gap-2">
                           <span className="material-symbols-outlined text-lg text-primary">route</span>
                           <h4 className="text-xs font-extrabold uppercase tracking-widest text-slate-500">Circuits</h4>
                           <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500 dark:bg-slate-800">
-                            {exploreCircuits.length}
+                            {circuitsAffiches.length}
                           </span>
                         </div>
                         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                          {exploreCircuits.map((circuit) => (
+                          {circuitsAffiches.map((circuit) => (
                             <CircuitCard
                               key={circuit.id}
                               circuit={circuit}

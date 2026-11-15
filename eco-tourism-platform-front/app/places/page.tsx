@@ -17,6 +17,8 @@ type Lieu = {
   place_name: string | null;
   description: string | null;
   region: string | null;
+  /** Nature du lieu, renseignée en base ; null pour les lieux non classés. */
+  category?: string | null;
   image: string | null;
   /** Galerie complète : plusieurs photos par lieu. */
   images?: string[] | null;
@@ -26,6 +28,9 @@ type Lieu = {
   /** Nombre de « j'aime » ; le serveur trie déjà par ce champ décroissant. */
   likes_count: number;
 };
+
+/** Libellé affiché pour un lieu sans catégorie renseignée. */
+const AUTRE = "Autres lieux";
 
 /**
  * Page publique dédiée aux lieux de la communauté.
@@ -40,6 +45,7 @@ export default function PlacesPage() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [region, setRegion] = useState("");
+  const [category, setCategory] = useState<string | null>(null);
 
   useEffect(() => {
     apiFetch<Lieu[]>("/publications/places")
@@ -56,10 +62,24 @@ export default function PlacesPage() {
     [lieux],
   );
 
+  // Filtres par nature de lieu : les catégories réellement présentes, avec
+  // leur nombre, comme les puces de la carte de l'accueil.
+  const categories = useMemo(() => {
+    const compte = new Map<string, number>();
+    for (const lieu of lieux) {
+      const c = lieu.category?.trim() || AUTRE;
+      compte.set(c, (compte.get(c) ?? 0) + 1);
+    }
+    return [...compte.entries()]
+      .sort((a, b) => (a[0] === AUTRE ? 1 : b[0] === AUTRE ? -1 : b[1] - a[1]))
+      .map(([label, nombre]) => ({ label, nombre }));
+  }, [lieux]);
+
   const filtered = useMemo(
     () =>
       lieux
         .filter((l) => {
+          if (category && (l.category?.trim() || AUTRE) !== category) return false;
           const q = search.trim().toLowerCase();
           if (
             q &&
@@ -78,7 +98,7 @@ export default function PlacesPage() {
             (b.likes_count ?? 0) - (a.likes_count ?? 0) ||
             (a.place_name ?? "").localeCompare(b.place_name ?? "", "fr"),
         ),
-    [lieux, search, region],
+    [lieux, search, region, category],
   );
 
   return (
@@ -142,6 +162,44 @@ export default function PlacesPage() {
               </select>
             </div>
           </div>
+
+          {/* Puces de catégorie : même logique que la carte de l'accueil. */}
+          {categories.length > 1 && (
+            <div
+              className="mt-4 flex flex-wrap items-center gap-2"
+              role="group"
+              aria-label="Filtrer les lieux par catégorie"
+            >
+              {[
+                { label: null as string | null, texte: "Tous les lieux", nombre: lieux.length },
+                ...categories.map((c) => ({ label: c.label, texte: c.label, nombre: c.nombre })),
+              ].map((c) => {
+                const actif = category === c.label;
+                return (
+                  <button
+                    key={c.texte}
+                    type="button"
+                    aria-pressed={actif}
+                    onClick={() => setCategory(c.label)}
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-bold transition-colors ${
+                      actif
+                        ? "border-primary bg-primary text-slate-900"
+                        : "border-slate-300 bg-white text-slate-700 hover:border-primary hover:text-slate-900"
+                    }`}
+                  >
+                    {c.texte}
+                    <span
+                      className={`text-[11px] font-black ${
+                        actif ? "text-slate-800" : "text-slate-400"
+                      }`}
+                    >
+                      {c.nombre}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </section>
 
         {/* Grille */}
