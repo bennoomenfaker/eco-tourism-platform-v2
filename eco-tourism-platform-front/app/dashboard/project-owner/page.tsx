@@ -482,7 +482,7 @@ function ProjectOwnerDashboardContent() {
         </DashboardSidebar>
 
         {/* ── Main ────────────────────────────────────────────────────────── */}
-        <main className="flex-1 lg:ml-72">
+        <main className="flex-1 min-w-0 lg:ml-72">
 
           <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-primary/10 bg-white/80 px-4 backdrop-blur-md dark:bg-slate-900/80 lg:h-24 lg:px-10">
             <div className="flex min-w-0 items-center gap-3 lg:gap-12">

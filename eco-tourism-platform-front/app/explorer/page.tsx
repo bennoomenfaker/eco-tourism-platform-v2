@@ -973,7 +973,7 @@ function ExplorerContent() {
         {/* ── Sidebar ─────────────────────────────────────────────────────── */}
         <DashboardSidebar>
           <div className="p-6 flex flex-col h-full">
-            <div className="flex items-center gap-3 mb-10">
+            <div className="-mt-2 mb-6 flex items-center gap-3">
               <Leaf className="text-primary w-8 h-8" />
               <h1 className="text-xl font-extrabold tracking-tight">Éco-Voyage</h1>
             </div>
@@ -1014,18 +1014,15 @@ function ExplorerContent() {
               </div>
             )}
 
-            <button
-              onClick={() => router.push(role === "guide" ? "/questionnaire/guide" : role === "eco_traveler" ? "/questionnaire/eco-traveler" : "/questionnaire/provider")}
-              className="mt-4 w-full bg-primary hover:bg-primary/90 text-slate-900 font-bold py-3 rounded-xl transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
-            >
-              <span className="material-symbols-outlined">quiz</span>
-              {profile?.sustainability_score === null ? "Passer l'évaluation" : "Voir mon score"}
-            </button>
+            {/* Le bouton « Voir mon score » a été retiré de la barre latérale :
+                il allongeait le menu au point de créer un défilement vertical.
+                L'accès au questionnaire reste dans le tableau de bord, via la
+                bannière d'évaluation de durabilité. */}
           </div>
         </DashboardSidebar>
 
         {/* ── Main ────────────────────────────────────────────────────────── */}
-        <main className="flex-1 lg:ml-72">
+        <main className="flex-1 min-w-0 lg:ml-72">
 
           {/* ── Header ── */}
           <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-primary/10 bg-white/80 px-4 backdrop-blur-md dark:bg-slate-900/80 lg:h-24 lg:px-10">
@@ -1198,7 +1195,7 @@ function ExplorerContent() {
                       type="button"
                       onClick={story.ouvrir}
                       title={story.titre}
-                      className="group flex w-16 shrink-0 flex-col items-center gap-1.5"
+                      className="group flex w-14 shrink-0 flex-col items-center gap-1"
                     >
                       <span className="rounded-full bg-gradient-to-tr from-primary to-emerald-400 p-[2px]">
                         <span className="block rounded-full bg-white p-[2px] dark:bg-slate-900">
@@ -1207,10 +1204,10 @@ function ExplorerContent() {
                               src={story.image}
                               alt=""
                               loading="lazy"
-                              className="h-14 w-14 rounded-full object-cover transition-transform group-hover:scale-105"
+                              className="h-12 w-12 rounded-full object-cover transition-transform group-hover:scale-105"
                             />
                           ) : (
-                            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/15 text-primary">
+                            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/15 text-primary">
                               <span className="material-symbols-outlined text-xl">
                                 {story.genre === "Circuit" ? "route" : "storefront"}
                               </span>
@@ -1218,7 +1215,7 @@ function ExplorerContent() {
                           )}
                         </span>
                       </span>
-                      <span className="w-16 truncate text-center text-[10px] font-semibold text-slate-600 dark:text-slate-300">
+                      <span className="w-14 truncate text-center text-[10px] font-semibold text-slate-600 dark:text-slate-300">
                         {story.titre}
                       </span>
                     </button>
@@ -1255,13 +1252,23 @@ function ExplorerContent() {
                             {exploreOffers.length}
                           </span>
                         </div>
-                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                        {/* Carrousel horizontal : les 6 offres restent sur une
+                            seule ligne, chaque carte prend toute la largeur sur
+                            mobile et une largeur fixe sur bureau. */}
+                        <div
+                          className="-mx-1 flex snap-x snap-mandatory gap-4 overflow-x-auto px-1 pb-2"
+                          style={{ scrollbarWidth: "none" }}
+                        >
                           {exploreOffers.map((offer) => (
-                            <OfferCard
+                            <div
                               key={offer.id}
-                              offer={offer}
-                              onClick={() => openDetail(asFeedItem(offer, "offer"))}
-                            />
+                              className="w-full shrink-0 snap-start sm:w-[320px]"
+                            >
+                              <OfferCard
+                                offer={offer}
+                                onClick={() => openDetail(asFeedItem(offer, "offer"))}
+                              />
+                            </div>
                           ))}
                         </div>
                       </section>

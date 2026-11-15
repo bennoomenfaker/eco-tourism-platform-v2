@@ -47,6 +47,19 @@ function completude(carte: Carte): number {
  * nuitée de démonstration (« Écolodge Les Chênes »), qui occupaient à elles
  * seules la moitié de la grille d'accueil. Les fiches restent en catalogue.
  */
+/**
+ * Fiches demandées explicitement en vitrine : elles passent devant le
+ * classement automatique. Les autres places sont complétées par le classement.
+ */
+const OFFRES_EPINGLEES = [
+  "Gite de Douiret",
+  "Gite ksar Hadada",
+  "Ornithologie — Matinée aux étangs",
+  "Écolodge Les Chênes — Choisissez",
+  "Visite guidée patrimoine El Kef",
+  "Circuit éco-responsable",
+];
+
 const OFFRES_MASQUEES = new Set([
   "dff8d68c-1899-4824-9be4-cc1602e632f9", // Nuitée Écolodge Les Chênes
   "ba0d1e8d-afec-444b-9494-afa560c601b3", // Nuitée — Chambre Forêt
@@ -128,7 +141,23 @@ export default function FeaturedExperiences() {
       const orgs = new Set<string>();
       const regions = new Map<string, number>();
       const vitrine: Carte[] = [];
+
+      // Les fiches demandées d'abord, dans l'ordre demandé (elles peuvent
+      // figurer dans OFFRES_MASQUEES : la demande explicite passe avant).
+      const toutes = [...cartesOffres, ...cartesCircuits];
+      for (const epingle of OFFRES_EPINGLEES) {
+        if (vitrine.length === 6) break;
+        const trouvee = toutes.find(
+          (c) => c.title.toLowerCase().includes(epingle.toLowerCase()),
+        );
+        if (!trouvee || vitrine.some((v) => v.id === trouvee.id)) continue;
+        vitrine.push(trouvee);
+        const photo = clePhoto(trouvee.image);
+        if (photo) photos.add(photo);
+      }
+
       for (const c of ordonnees) {
+        if (vitrine.some((v) => v.id === c.id)) continue;
         const photo = clePhoto(c.image);
         if (photo && photos.has(photo)) continue;
 
@@ -153,7 +182,9 @@ export default function FeaturedExperiences() {
     <section id="publications" className="scroll-mt-24 py-24 px-6 md:px-20 lg:px-40 max-w-[1440px] mx-auto">
       <div className="flex flex-wrap items-end justify-between gap-4 mb-12">
         <div className="space-y-2">
-          <h2 className="text-3xl font-black text-slate-900 dark:text-slate-50 tracking-tight">
+          {/* Titre lisible dans les deux thèmes : la section est sur fond clair,
+              un `dark:text-slate-50` le rendait invisible en mode sombre. */}
+          <h2 className="text-3xl font-black text-slate-900 tracking-tight">
             Les mieux notées
           </h2>
           <p className="text-slate-500">
