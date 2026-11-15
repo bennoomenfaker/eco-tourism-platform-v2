@@ -5,6 +5,12 @@ import { useRouter } from "next/navigation";
 import { Leaf, Plus, X, Check } from "lucide-react";
 import { logoutUser } from "@/lib/auth";
 import { apiFetch } from "@/lib/api";
+import {
+  DashboardNavProvider,
+  DashboardNavToggle,
+  DashboardSidebar,
+  useDashboardNav,
+} from "@/components/dashboard/MobileNav";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -322,7 +328,16 @@ function AddProjectModal({
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function ProjectOwnerDashboardPage() {
+  return (
+    <DashboardNavProvider>
+      <ProjectOwnerDashboardContent />
+    </DashboardNavProvider>
+  );
+}
+
+function ProjectOwnerDashboardContent() {
   const router = useRouter();
+  const { close: closeNav } = useDashboardNav();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<OwnerProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -413,7 +428,7 @@ export default function ProjectOwnerDashboardPage() {
       <div className="flex min-h-screen">
 
         {/* ── Sidebar ─────────────────────────────────────────────────────── */}
-        <aside className="w-72 bg-white dark:bg-slate-900 border-r border-primary/10 flex flex-col fixed h-full">
+        <DashboardSidebar>
           <div className="p-6 flex flex-col h-full">
             <div className="flex items-center gap-3 mb-10">
               <Leaf className="text-primary w-8 h-8" />
@@ -424,7 +439,7 @@ export default function ProjectOwnerDashboardPage() {
               {navItems.map((item) => (
                 <button
                   key={item.label}
-                  onClick={() => setActiveItem(item.label)}
+                  onClick={() => { closeNav(); setActiveItem(item.label); }}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                     activeItem === item.label
                       ? "bg-primary/10 text-primary font-bold"
@@ -464,17 +479,18 @@ export default function ProjectOwnerDashboardPage() {
               {score === null ? "Passer l'évaluation" : "Voir mon score"}
             </button>
           </div>
-        </aside>
+        </DashboardSidebar>
 
         {/* ── Main ────────────────────────────────────────────────────────── */}
-        <main className="flex-1 ml-72">
+        <main className="flex-1 lg:ml-72">
 
-          <header className="h-24 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-primary/10 px-10 flex items-center justify-between sticky top-0 z-10">
-            <div className="flex items-center gap-12 shrink-0">
-              <h2 className="text-2xl font-bold whitespace-nowrap">
+          <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-primary/10 bg-white/80 px-4 backdrop-blur-md dark:bg-slate-900/80 lg:h-24 lg:px-10">
+            <div className="flex min-w-0 items-center gap-3 lg:gap-12">
+              <DashboardNavToggle />
+              <h2 className="truncate text-lg font-bold lg:text-2xl">
                 Bonjour, {profile?.full_name || user?.full_name || "Prestataire"}
               </h2>
-              <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-full px-5 py-2 gap-2 whitespace-nowrap">
+              <div className="hidden shrink-0 items-center bg-slate-100 dark:bg-slate-800 rounded-full px-5 py-2 gap-2 whitespace-nowrap md:flex">
                 <span className="material-symbols-outlined text-primary text-base">domain_verification</span>
                 <span className="text-sm font-semibold">
                   {score !== null ? getScoreLabel(score) : "Prestataire — Évaluation en attente"}
@@ -482,8 +498,8 @@ export default function ProjectOwnerDashboardPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-6 flex-1 justify-end">
-              <div className="relative w-full max-w-md">
+            <div className="flex min-w-0 flex-1 items-center justify-end gap-2 lg:gap-6">
+              <div className="relative hidden w-full max-w-md md:block">
                 <input
                   className="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl py-3 pl-12 pr-4 text-sm focus:ring-2 focus:ring-primary/50"
                   placeholder="Rechercher un projet, une région…"
@@ -493,7 +509,7 @@ export default function ProjectOwnerDashboardPage() {
               <button className="size-11 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-primary/10 hover:text-primary transition-colors shrink-0">
                 <span className="material-symbols-outlined">notifications</span>
               </button>
-              <div className="h-10 w-[1px] bg-slate-200 dark:bg-slate-700 shrink-0" />
+              <div className="hidden h-10 w-[1px] bg-slate-200 dark:bg-slate-700 shrink-0 sm:block" />
               <button onClick={() => router.push("/profile/project-owner")}
                 className="size-11 rounded-full bg-slate-200 border-2 border-primary overflow-hidden shrink-0 hover:opacity-80 transition-opacity" title="Voir mon profil">
                 {profile?.photo ? (
@@ -507,7 +523,7 @@ export default function ProjectOwnerDashboardPage() {
             </div>
           </header>
 
-          <div className="p-8">
+          <div className="p-4 sm:p-6 lg:p-8">
 
             {/* Bannière questionnaire non complété */}
             {score === null && (

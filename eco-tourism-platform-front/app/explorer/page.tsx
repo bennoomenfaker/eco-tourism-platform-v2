@@ -14,6 +14,12 @@ import OfferDetailView from "@/components/offer/OfferDetailView";
 import CircuitDetailView from "@/components/circuit/CircuitDetailView";
 import SustainabilityBadge from "@/components/common/SustainabilityBadge";
 import { goToReservation, goToCircuitReservation } from "@/lib/auth";
+import {
+  DashboardNavProvider,
+  DashboardNavToggle,
+  DashboardSidebar,
+  useDashboardNav,
+} from "@/components/dashboard/MobileNav";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -580,66 +586,6 @@ function CircuitCard({ circuit, onClick }: { circuit: CircuitFeed; onClick: () =
   );
 }
 
-// ─── RecoCard ─────────────────────────────────────────────────────────────────
-
-function RecoCard({ item, onOpen }: { item: RecommendedItem; onOpen: () => void }) {
-  const isOffer = item.type === "offer";
-  const data = item.data as any;
-  const image = isOffer
-    ? (data.images?.[0] ?? OFFER_PLACEHOLDERS[seedFromId(item.id, OFFER_PLACEHOLDERS.length)])
-    : (data.cover_image ?? OFFER_PLACEHOLDERS[seedFromId(item.id, OFFER_PLACEHOLDERS.length)]);
-  const authorName = data.org_name ?? data.author_name ?? null;
-  const authorPhoto = data.org_logo ?? data.author_photo ?? null;
-
-  return (
-    <div
-      className="w-56 shrink-0 flex flex-col rounded-2xl overflow-hidden bg-white border border-slate-100 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 cursor-pointer group"
-      onClick={onOpen}
-    >
-      <div className="relative h-36 overflow-hidden">
-        <div className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500" style={{ backgroundImage: `url('${image}')` }} />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-        <div className="absolute top-2 left-2 flex gap-1.5">
-          <span className="bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded-full text-[10px] font-extrabold text-slate-700 uppercase tracking-wider shadow-sm">
-            {isOffer ? "Offre" : "Circuit"}
-          </span>
-        </div>
-        <div className="absolute bottom-2 left-2">
-          {item.matchScore > 0 ? (
-            <span className="flex items-center gap-1 bg-primary text-slate-900 px-2 py-0.5 rounded-full text-[10px] font-extrabold shadow-sm">
-              <Sparkles className="w-2.5 h-2.5" />
-              {item.matchScore} tag{item.matchScore > 1 ? "s" : ""} en commun
-            </span>
-          ) : (item.likesCount ?? 0) > 0 ? (
-            <span className="flex items-center gap-1 bg-white/90 backdrop-blur-sm text-slate-700 px-2 py-0.5 rounded-full text-[10px] font-extrabold shadow-sm">
-              ❤️ {item.likesCount} j&apos;aime
-            </span>
-          ) : null}
-        </div>
-      </div>
-      <div className="p-3 flex flex-col flex-1">
-        <h4 className="font-extrabold text-slate-900 text-sm line-clamp-2 group-hover:text-primary transition-colors mb-2">{data.title}</h4>
-        <SustainabilityBadge score={data.sustainability_score} kind={isOffer ? "offer" : "circuit"} className="mb-2 self-start" />
-        {authorName && (
-          <div className="flex items-center gap-1.5 mb-2">
-            {authorPhoto
-              ? <img src={authorPhoto} alt="" className="w-5 h-5 rounded-full object-cover border border-slate-100 shrink-0" />
-              : <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-primary font-black text-[8px] shrink-0">{authorName[0]?.toUpperCase()}</div>
-            }
-            <span className="text-[11px] font-semibold text-slate-500 truncate">{authorName}</span>
-          </div>
-        )}
-        <button
-          className="mt-auto w-full py-1.5 rounded-lg bg-primary/10 text-primary font-bold text-xs hover:bg-primary/20 transition-colors"
-          onClick={(e) => { e.stopPropagation(); onOpen(); }}
-        >
-          Voir
-        </button>
-      </div>
-    </div>
-  );
-}
-
 // ─── PublicationCard ──────────────────────────────────────────────────────────
 
 function PublicationCard({
@@ -789,7 +735,16 @@ function PublicationCard({
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ExplorerPage() {
+  return (
+    <DashboardNavProvider>
+      <ExplorerContent />
+    </DashboardNavProvider>
+  );
+}
+
+function ExplorerContent() {
   const router   = useRouter();
+  const { close: closeNav } = useDashboardNav();
   const notifRef = useRef<HTMLDivElement>(null);
 
   const [role, setRole]         = useState<string | null>(null);
@@ -811,6 +766,11 @@ export default function ExplorerPage() {
   const [recommendations, setRecommendations] = useState<RecommendedItem[]>([]);
   const [recoMode, setRecoMode] = useState<"tagged" | "recent">("recent");
   const [recoLoading, setRecoLoading] = useState(false);
+  // Recommandations et catalogue public ne se recouvrent pas toujours : quand
+  // le classement par likes ne retient aucune offre (ou aucun circuit), la
+  // section correspondante resterait vide. Ces listes servent de complément.
+  const [latestOffers, setLatestOffers]     = useState<OfferFeed[]>([]);
+  const [latestCircuits, setLatestCircuits] = useState<CircuitFeed[]>([]);
 
   /* ── Close notif dropdown on outside click ── */
   useEffect(() => {
@@ -862,6 +822,22 @@ export default function ExplorerPage() {
       .catch((err) => setError(err.message ?? "Erreur lors du chargement du fil"))
       .finally(() => setLoading(false));
   }, [role, token]);
+
+  /* ── Catalogue public (complément des recommandations) ── */
+  useEffect(() => {
+    let alive = true;
+    Promise.all([
+      apiFetch<OfferFeed[]>("/offers"),
+      apiFetch<CircuitFeed[]>("/circuits/all-public"),
+    ])
+      .then(([offers, circuits]) => {
+        if (!alive) return;
+        setLatestOffers(offers);
+        setLatestCircuits(circuits);
+      })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, []);
 
   /* ── Recommendations (tous les rôles) ── */
   useEffect(() => {
@@ -962,6 +938,29 @@ export default function ExplorerPage() {
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
+  // Les recommandations sont montrées par nature, avec les mêmes cartes que
+  // /destinations (offres) et la section Circuits : deux blocs lisibles plutôt
+  // qu'une rangée horizontale de vignettes. Le catalogue public complète chaque
+  // bloc quand les recommandations ne contiennent qu'un seul type.
+  const recOfferData   = recommendations.filter((r) => r.type === "offer").map((r) => r.data as OfferFeed);
+  const recCircuitData = recommendations.filter((r) => r.type === "circuit").map((r) => r.data as CircuitFeed);
+
+  const seenOfferIds = new Set(recOfferData.map((o) => o.id));
+  const seenCircuitIds = new Set(recCircuitData.map((c) => c.id));
+
+  const exploreOffers = [
+    ...recOfferData,
+    ...latestOffers.filter((o) => !seenOfferIds.has(o.id)),
+  ].slice(0, 9);
+  const exploreCircuits = [
+    ...recCircuitData,
+    ...latestCircuits.filter((c) => !seenCircuitIds.has(c.id)),
+  ].slice(0, 6);
+
+  function asFeedItem(item: OfferFeed | CircuitFeed, type: "offer" | "circuit"): FeedItem {
+    return { type, id: item.id, created_at: item.created_at, data: item } as FeedItem;
+  }
+
   const emptyTitle = role === "eco_traveler" ? "Votre fil est vide pour l'instant" : "Votre fil professionnel est vide";
   const emptyDesc  = role === "eco_traveler"
     ? "Suivez des guides et prestataires pour voir leurs offres et circuits ici, et ajoutez des amis pour voir leurs publications."
@@ -972,7 +971,7 @@ export default function ExplorerPage() {
       <div className="flex min-h-screen">
 
         {/* ── Sidebar ─────────────────────────────────────────────────────── */}
-        <aside className="w-72 bg-white dark:bg-slate-900 border-r border-primary/10 flex flex-col fixed h-full">
+        <DashboardSidebar>
           <div className="p-6 flex flex-col h-full">
             <div className="flex items-center gap-3 mb-10">
               <Leaf className="text-primary w-8 h-8" />
@@ -983,7 +982,7 @@ export default function ExplorerPage() {
               {navItems.map((item) => (
                 <button
                   key={item.label}
-                  onClick={() => router.push(item.href)}
+                  onClick={() => { closeNav(); router.push(item.href); }}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                     item.href === "/explorer"
                       ? "bg-primary/10 text-primary font-bold"
@@ -1023,16 +1022,17 @@ export default function ExplorerPage() {
               {profile?.sustainability_score === null ? "Passer l'évaluation" : "Voir mon score"}
             </button>
           </div>
-        </aside>
+        </DashboardSidebar>
 
         {/* ── Main ────────────────────────────────────────────────────────── */}
-        <main className="flex-1 ml-72">
+        <main className="flex-1 lg:ml-72">
 
           {/* ── Header ── */}
-          <header className="h-24 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-primary/10 px-10 flex items-center justify-between sticky top-0 z-10">
+          <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-primary/10 bg-white/80 px-4 backdrop-blur-md dark:bg-slate-900/80 lg:h-24 lg:px-10">
             {/* Search — left */}
-            <div className="flex-1 max-w-xl">
-              <div className="relative">
+            <div className="flex min-w-0 flex-1 items-center gap-3">
+              <DashboardNavToggle />
+              <div className="relative hidden min-w-0 flex-1 max-w-xl md:block">
                 <input
                   className="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl py-3 pl-12 pr-4 text-sm focus:ring-2 focus:ring-primary/50"
                   placeholder="Rechercher une offre, un circuit…"
@@ -1040,10 +1040,11 @@ export default function ExplorerPage() {
                 />
                 <span className="material-symbols-outlined absolute left-4 top-3 text-slate-400 text-xl">search</span>
               </div>
+              <span className="truncate text-base font-bold md:hidden">Explorer</span>
             </div>
 
             {/* Right — notifications + avatar */}
-            <div className="flex items-center gap-6 shrink-0 ml-6">
+            <div className="flex shrink-0 items-center gap-2 lg:gap-6">
               {/* Notifications */}
               <div ref={notifRef} className="relative shrink-0">
                 <button
@@ -1059,7 +1060,7 @@ export default function ExplorerPage() {
                 </button>
 
                 {notifOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl z-50">
+                  <div className="absolute right-0 top-full mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl z-50">
                     <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800 rounded-t-2xl">
                       <span className="font-semibold text-sm">Notifications</span>
                       {notifications.some((n) => !n.is_read) && (
@@ -1140,7 +1141,7 @@ export default function ExplorerPage() {
                 )}
               </div>
 
-              <div className="h-10 w-[1px] bg-slate-200 dark:bg-slate-700 shrink-0" />
+              <div className="hidden h-10 w-[1px] bg-slate-200 dark:bg-slate-700 shrink-0 sm:block" />
 
               {/* Profile avatar */}
               <button
@@ -1159,7 +1160,7 @@ export default function ExplorerPage() {
           </header>
 
           {/* ── Feed content ── */}
-          <div className="p-8">
+          <div className="p-4 sm:p-6 lg:p-8">
             <div className="mb-6">
               <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">Explorer</h2>
               <p className="text-sm text-slate-500 mt-1">
@@ -1170,7 +1171,7 @@ export default function ExplorerPage() {
             </div>
 
             {/* ── Pour vous / À découvrir (recommendations) ── */}
-            {(recoLoading || recommendations.length > 0) && (
+            {(recoLoading || exploreOffers.length > 0 || exploreCircuits.length > 0) && (
               <div className="mb-8">
                 <div className="flex items-center gap-2 mb-4">
                   <Sparkles className="w-4 h-4 text-primary" />
@@ -1187,14 +1188,48 @@ export default function ExplorerPage() {
                     <span className="text-xs text-slate-400">Chargement des recommandations…</span>
                   </div>
                 ) : (
-                  <div className="flex gap-4 overflow-x-auto pb-2" style={{ scrollbarWidth: "none" }}>
-                    {recommendations.map((reco) => (
-                      <RecoCard
-                        key={reco.id}
-                        item={reco}
-                        onOpen={() => openDetail(reco as unknown as FeedItem)}
-                      />
-                    ))}
+                  <div className="space-y-8">
+                    {exploreOffers.length > 0 && (
+                      <section>
+                        <div className="mb-3 flex items-center gap-2">
+                          <span className="material-symbols-outlined text-lg text-primary">storefront</span>
+                          <h4 className="text-xs font-extrabold uppercase tracking-widest text-slate-500">Offres</h4>
+                          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500 dark:bg-slate-800">
+                            {exploreOffers.length}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                          {exploreOffers.map((offer) => (
+                            <OfferCard
+                              key={offer.id}
+                              offer={offer}
+                              onClick={() => openDetail(asFeedItem(offer, "offer"))}
+                            />
+                          ))}
+                        </div>
+                      </section>
+                    )}
+
+                    {exploreCircuits.length > 0 && (
+                      <section>
+                        <div className="mb-3 flex items-center gap-2">
+                          <span className="material-symbols-outlined text-lg text-primary">route</span>
+                          <h4 className="text-xs font-extrabold uppercase tracking-widest text-slate-500">Circuits</h4>
+                          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500 dark:bg-slate-800">
+                            {exploreCircuits.length}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                          {exploreCircuits.map((circuit) => (
+                            <CircuitCard
+                              key={circuit.id}
+                              circuit={circuit}
+                              onClick={() => openDetail(asFeedItem(circuit, "circuit"))}
+                            />
+                          ))}
+                        </div>
+                      </section>
+                    )}
                   </div>
                 )}
               </div>

@@ -10,6 +10,12 @@ import BadgeChip from "@/components/common/BadgeChip";
 import { DemandesRecuesPanel, type ReservationDashboard } from "@/components/reservation/DashboardReservations";
 import ScoreBadgeCard from "@/components/common/ScoreBadgeCard";
 import DetailCompletion from "@/components/common/DetailCompletion";
+import {
+  DashboardNavProvider,
+  DashboardNavToggle,
+  DashboardSidebar,
+  useDashboardNav,
+} from "@/components/dashboard/MobileNav";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -86,7 +92,16 @@ function getScoreLabel(score: number | null) {
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function ProviderDashboardPage() {
+  return (
+    <DashboardNavProvider>
+      <ProviderDashboardContent />
+    </DashboardNavProvider>
+  );
+}
+
+function ProviderDashboardContent() {
   const router = useRouter();
+  const { close: closeNav } = useDashboardNav();
   const [user, setUser] = useState<User | null>(null);
   const [provider, setProvider] = useState<Provider | null>(null);
   const [orgLogo, setOrgLogo] = useState<string | null>(null);
@@ -295,7 +310,7 @@ export default function ProviderDashboardPage() {
       <div className="flex min-h-screen">
 
         {/* ── Sidebar ─────────────────────────────────────────────────────── */}
-        <aside className="w-72 bg-white dark:bg-slate-900 border-r border-primary/10 flex flex-col fixed h-full">
+        <DashboardSidebar>
           <div className="p-6 flex flex-col h-full">
             <div className="flex items-center gap-3 mb-10">
               <Leaf className="text-primary w-8 h-8" />
@@ -307,6 +322,8 @@ export default function ProviderDashboardPage() {
                 <button
                   key={item.label}
                   onClick={() => {
+                    // Le tiroir mobile se referme dès qu'on choisit une entrée.
+                    closeNav();
                     if ("section" in item) {
                       setActiveItem(item.label);
                       // L'adresse suit la section affichée : sans cela, un
@@ -359,21 +376,24 @@ export default function ProviderDashboardPage() {
               total={provider?.profile_completion ?? 0}
             />
           </div>
-        </aside>
+        </DashboardSidebar>
 
         {/* ── Main ────────────────────────────────────────────────────────── */}
-        <main className="flex-1 ml-72">
+        <main className="flex-1 lg:ml-72">
 
-          <header className="h-24 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-primary/10 px-10 flex items-center justify-between sticky top-0 z-10">
-            <div className="flex items-center gap-12 shrink-0">
-              <h2 className="text-2xl font-bold whitespace-nowrap">
+          <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-primary/10 bg-white/80 px-4 backdrop-blur-md dark:bg-slate-900/80 lg:h-24 lg:px-10">
+            <div className="flex min-w-0 items-center gap-3 lg:gap-12">
+              <DashboardNavToggle />
+              <h2 className="truncate text-lg font-bold lg:text-2xl">
                 Bonjour, {provider.full_name || user?.full_name || "Prestataire"}
               </h2>
-              <BadgeChip role="provider" icon="domain_verification" fallback={score !== null ? getScoreLabel(score) : "Prestataire — Évaluation en attente"} />
+              <div className="hidden shrink-0 md:block">
+                <BadgeChip role="provider" icon="domain_verification" fallback={score !== null ? getScoreLabel(score) : "Prestataire — Évaluation en attente"} />
+              </div>
             </div>
 
-            <div className="flex items-center gap-6 flex-1 justify-end">
-              <div className="relative w-full max-w-md">
+            <div className="flex min-w-0 flex-1 items-center justify-end gap-2 lg:gap-6">
+              <div className="relative hidden w-full max-w-md md:block">
                 <input
                   className="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl py-3 pl-12 pr-4 text-sm focus:ring-2 focus:ring-primary/50"
                   placeholder="Rechercher une activité, une région…"
@@ -394,7 +414,7 @@ export default function ProviderDashboardPage() {
                 </button>
 
                 {notifOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl z-50">
+                  <div className="absolute right-0 top-full mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl z-50">
                     <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800 rounded-t-2xl">
                       <span className="font-semibold text-sm">Notifications</span>
                       {notifications.some((n) => !n.is_read) && (
@@ -513,7 +533,7 @@ export default function ProviderDashboardPage() {
                   </div>
                 )}
               </div>
-              <div className="h-10 w-[1px] bg-slate-200 dark:bg-slate-700 shrink-0" />
+              <div className="hidden h-10 w-[1px] bg-slate-200 dark:bg-slate-700 shrink-0 sm:block" />
               <button
                 onClick={() => router.push("/profile/provider")}
                 className="size-11 rounded-full bg-slate-200 border-2 border-primary overflow-hidden shrink-0 hover:opacity-80 transition-opacity"
@@ -530,7 +550,7 @@ export default function ProviderDashboardPage() {
             </div>
           </header>
 
-          <div className="p-8">
+          <div className="p-4 sm:p-6 lg:p-8">
 
             {activeItem === "Tableau de bord" && (<>
 

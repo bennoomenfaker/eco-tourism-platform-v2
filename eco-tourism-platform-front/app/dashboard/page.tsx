@@ -6,6 +6,12 @@ import dynamic from "next/dynamic";
 import { Leaf, Plus, X, Check, MapPin, ArrowRight } from "lucide-react";
 import { logoutUser } from "@/lib/auth";
 import { apiFetch } from "@/lib/api";
+import {
+  DashboardNavProvider,
+  DashboardNavToggle,
+  DashboardSidebar,
+  useDashboardNav,
+} from "@/components/dashboard/MobileNav";
 import { ECHELLE_PAR_ROLE } from "@/lib/constants/badges";
 import { cheminTableauDeBord } from "@/lib/dashboard-path";
 import OfferDetailView, { type OfferFull } from "@/components/offer/OfferDetailView";
@@ -999,7 +1005,16 @@ function AddProjectModal({ onClose, onSuccess, token }: {
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
+  return (
+    <DashboardNavProvider>
+      <DashboardContent />
+    </DashboardNavProvider>
+  );
+}
+
+function DashboardContent() {
   const router = useRouter();
+  const { close: closeNav } = useDashboardNav();
   const [role, setRole] = useState<Role | null>(null);
   const [profile, setProfile] = useState<AnyProfile | null>(null);
   const [activeItem, setActiveItem] = useState("Tableau de bord");
@@ -1605,7 +1620,7 @@ export default function DashboardPage() {
       <div className="flex min-h-screen">
 
         {/* ── Sidebar ─────────────────────────────────────────────────────── */}
-        <aside className="w-72 bg-white dark:bg-slate-900 border-r border-primary/10 flex flex-col fixed h-full">
+        <DashboardSidebar>
           <div className="p-6 flex flex-col h-full">
             <div className="flex items-center gap-3 mb-10">
               <Leaf className="text-primary w-8 h-8" />
@@ -1614,7 +1629,7 @@ export default function DashboardPage() {
 
             <nav className="flex-1 space-y-1">
               {navItems.map((item) => (
-                <button key={item.label} onClick={item.action}
+                <button key={item.label} onClick={() => { closeNav(); item.action(); }}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                     activeItem === item.label || (item.label === "Offres" && activeItem === "Offres")
                       ? "bg-primary/10 text-primary font-bold"
@@ -1624,7 +1639,7 @@ export default function DashboardPage() {
                   <span>{item.label}</span>
                 </button>
               ))}
-              <button onClick={() => router.push("/messagerie")}
+              <button onClick={() => { closeNav(); router.push("/messagerie"); }}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
                 <span className="material-symbols-outlined">chat</span>
                 <span>Messagerie</span>
@@ -1659,25 +1674,28 @@ export default function DashboardPage() {
               total={profile?.profile_completion ?? 0}
             />
           </div>
-        </aside>
+        </DashboardSidebar>
 
         {/* ── Main ────────────────────────────────────────────────────────── */}
-        <main className="flex-1 ml-72">
+        <main className="flex-1 lg:ml-72">
 
-          <header className="h-24 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-primary/10 px-10 flex items-center justify-between sticky top-0 z-10">
-            <div className="flex items-center gap-12 shrink-0">
-              <h2 className="text-2xl font-bold whitespace-nowrap">
+          <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-primary/10 bg-white/80 px-4 backdrop-blur-md dark:bg-slate-900/80 lg:h-24 lg:px-10">
+            <div className="flex min-w-0 items-center gap-3 lg:gap-12">
+              <DashboardNavToggle />
+              <h2 className="truncate text-lg font-bold lg:text-2xl">
                 Bonjour, {profile.full_name || (role === "guide" ? "Guide" : role === "project" ? "Prestataire" : "Voyageur")}
               </h2>
-              <BadgeChip
-                role={role ?? ""}
-                icon={role === "project" ? "domain_verification" : "verified_user"}
-                fallback={score !== null ? getScoreLabel(score, role) : role === "eco_traveler" ? "Nouveau voyageur" : "Évaluation en attente"}
-              />
+              <div className="hidden shrink-0 md:block">
+                <BadgeChip
+                  role={role ?? ""}
+                  icon={role === "project" ? "domain_verification" : "verified_user"}
+                  fallback={score !== null ? getScoreLabel(score, role) : role === "eco_traveler" ? "Nouveau voyageur" : "Évaluation en attente"}
+                />
+              </div>
             </div>
 
-            <div className="flex items-center gap-6 flex-1 justify-end">
-              <div className="relative w-full max-w-md" ref={searchRef}>
+            <div className="flex min-w-0 flex-1 items-center justify-end gap-2 lg:gap-6">
+              <div className="relative hidden w-full max-w-md md:block" ref={searchRef}>
                 <input
                   className="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl py-3 pl-12 pr-4 text-sm focus:ring-2 focus:ring-primary/50"
                   placeholder={searchPlaceholder}
@@ -1742,7 +1760,7 @@ export default function DashboardPage() {
                 </button>
 
                 {notifOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl z-50">
+                  <div className="absolute right-0 top-full mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl z-50">
                     <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800 rounded-t-2xl">
                       <span className="font-semibold text-sm">Notifications</span>
                       {notifications.some((n) => !n.is_read) && (
@@ -1874,7 +1892,7 @@ export default function DashboardPage() {
                   </div>
                 )}
               </div>
-              <div className="h-10 w-[1px] bg-slate-200 dark:bg-slate-700 shrink-0" />
+              <div className="hidden h-10 w-[1px] bg-slate-200 dark:bg-slate-700 shrink-0 sm:block" />
               <button onClick={() => router.push(profilePath)}
                 className="size-11 rounded-full bg-slate-200 border-2 border-primary overflow-hidden shrink-0 hover:opacity-80 transition-opacity" title="Voir mon profil">
                 {profile.photo ? (
@@ -1888,7 +1906,7 @@ export default function DashboardPage() {
             </div>
           </header>
 
-          <div className="p-8">
+          <div className="p-4 sm:p-6 lg:p-8">
 
             {/* ── Tableau de bord ───────────────────────────────────────── */}
             {activeItem === "Tableau de bord" && (
