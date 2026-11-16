@@ -507,7 +507,7 @@ function ExperienceModal({ exp, onClose }: { exp: Experience; onClose: () => voi
 // ─── Sustainability helpers ────────────────────────────────────────────────────
 
 function sustainabilityLevel(score: number) {
-  if (score >= 86) return { label: "Ambassadeur Adventures.tn", color: "text-primary",      bar: "bg-primary" };
+  if (score >= 86) return { label: "Ambassadeur Sustainable Adventures", color: "text-primary",      bar: "bg-primary" };
   if (score >= 71) return { label: "Éco-Responsable",        color: "text-emerald-600", bar: "bg-emerald-500" };
   if (score >= 51) return { label: "Engagé",                 color: "text-teal-600",    bar: "bg-teal-500" };
   if (score >= 31) return { label: "Sensibilisé",            color: "text-blue-600",    bar: "bg-blue-500" };
@@ -1044,7 +1044,7 @@ export default function DestinationsPage({ interne = false }: { interne?: boolea
               </button>
               <div className="flex items-center gap-2 text-slate-900">
                 <Leaf className="text-primary w-6 h-6" />
-                <span className="text-base font-extrabold tracking-tight">Adventures.tn</span>
+                <span className="text-base font-extrabold tracking-tight">Sustainable Adventures</span>
               </div>
             </div>
           </div>
@@ -1278,13 +1278,13 @@ export default function DestinationsPage({ interne = false }: { interne?: boolea
           <div className="max-w-[1440px] mx-auto">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-8 h-0.5 bg-primary" />
-              <span className="text-primary font-extrabold text-sm uppercase tracking-widest">Adventures.tn</span>
+              <span className="text-primary font-extrabold text-sm uppercase tracking-widest">Sustainable Adventures</span>
             </div>
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10">
               <div>
                 <h2 className="text-3xl font-black text-slate-900 mb-2">Nos Partenaires</h2>
                 <p className="text-slate-500 max-w-lg">
-                  Découvrez les projets éco-touristiques validés par Adventures.tn qui contribuent à un tourisme durable en Tunisie.
+                  Découvrez les projets éco-touristiques validés par Sustainable Adventures qui contribuent à un tourisme durable en Tunisie.
                 </p>
               </div>
               <span className="text-sm font-semibold text-slate-400 shrink-0">

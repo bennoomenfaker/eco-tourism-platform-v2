@@ -651,7 +651,7 @@ export default function ReservationDetailPage() {
           </button>
           <div className="flex items-center gap-2 text-slate-900">
             <Leaf className="text-primary w-6 h-6" />
-            <span className="text-base font-extrabold tracking-tight">Adventures.tn</span>
+            <span className="text-base font-extrabold tracking-tight">Sustainable Adventures</span>
           </div>
         </div>
       </div>

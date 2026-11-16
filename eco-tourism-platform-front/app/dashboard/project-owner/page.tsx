@@ -78,7 +78,7 @@ const ECO_PRACTICES = [
 
 const BADGE_CONFIG = [
   { label: "Prestataire Éco-Certifié", icon: "verified", description: "Onboarding complété" },
-  { label: "Ambassadeur Adventures.tn", icon: "stars", description: "Score ≥ 80%" },
+  { label: "Ambassadeur Sustainable Adventures", icon: "stars", description: "Score ≥ 80%" },
   { label: "Projet d'Excellence", icon: "domain_verification", description: "10 réservations gérées" },
   { label: "Champion Durable", icon: "eco", description: "5 évaluations reçues" },
 ];
@@ -382,7 +382,7 @@ function ProjectOwnerDashboardContent() {
 
   async function handleLogout() {
     const tkn = localStorage.getItem("access_token") || "";
-    try { if (tkn) await logoutUser(tkn); } catch {}
+    if (tkn) logoutUser(tkn).catch(() => {});
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");
@@ -432,7 +432,7 @@ function ProjectOwnerDashboardContent() {
           <div className="p-6 flex flex-col h-full">
             <div className="flex items-center gap-3 mb-10">
               <Leaf className="text-primary w-8 h-8" />
-              <h1 className="text-xl font-extrabold tracking-tight">Adventures.tn</h1>
+              <h1 className="text-xl font-extrabold tracking-tight">Sustainable Adventures</h1>
             </div>
 
             <nav className="flex-1 space-y-1">

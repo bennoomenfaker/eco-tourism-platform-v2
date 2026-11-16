@@ -7,7 +7,7 @@ export default function Footer() {
         <div className="flex flex-col gap-6">
           <div className="flex items-center gap-2 text-slate-900 dark:text-slate-100">
             <Leaf className="text-primary w-8 h-8" />
-            <h2 className="text-xl font-extrabold tracking-tight">Adventures.tn</h2>
+            <h2 className="text-xl font-extrabold tracking-tight">Sustainable Adventures</h2>
           </div>
           <p className="text-slate-500 text-sm leading-relaxed">
             Redéfinir le voyage en mettant l'humain et la planète au centre de l'expérience.
@@ -61,7 +61,7 @@ export default function Footer() {
 
       <div className="max-w-[1440px] mx-auto mt-16 pt-8 border-t border-slate-50 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
         <p className="text-xs text-slate-400 font-medium">
-          © 2026 Adventures.tn. Fièrement engagé pour la planète.
+          © 2026 Sustainable Adventures. Fièrement engagé pour la planète.
         </p>
         <a href="/destinations" className="text-xs font-bold text-primary hover:underline underline-offset-4">
           Découvrir les offres et circuits

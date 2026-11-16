@@ -56,7 +56,7 @@ type EcoProfile = {
   profile_completion: number;
   is_onboarded: boolean;
 
-  // Score final + 4 composants (spec Adventures.tn)
+  // Score final + 4 composants (spec Sustainable Adventures)
   sustainability_score: number | null;
   score_questionnaire: number | null;  // 20%
   score_reservations: number;          // 40%
@@ -157,7 +157,7 @@ function EcoVoyageurDashboardContent() {
 
   async function handleLogout() {
     const token = localStorage.getItem("access_token");
-    try { if (token) await logoutUser(token); } catch {}
+    if (token) logoutUser(token).catch(() => {});
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");
@@ -176,7 +176,7 @@ function EcoVoyageurDashboardContent() {
           <div className="p-6 flex flex-col h-full">
             <div className="flex items-center gap-3 mb-10">
               <Leaf className="text-primary w-8 h-8" />
-              <h1 className="text-xl font-extrabold tracking-tight">Adventures.tn</h1>
+              <h1 className="text-xl font-extrabold tracking-tight">Sustainable Adventures</h1>
             </div>
 
             <nav className="flex-1 space-y-1">

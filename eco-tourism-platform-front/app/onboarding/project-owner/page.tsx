@@ -133,7 +133,7 @@ function StepOrganization({ data, setData }: any) {
             className="w-full pl-11 pr-4 py-3.5 bg-surface-container border-none rounded-xl focus:ring-2 focus:ring-primary text-slate-900 placeholder:text-slate-400 font-medium"
             value={data.organization}
             onChange={(e) => setData({ ...data, organization: e.target.value })}
-            placeholder="Adventures.tn, Éco-Lodge Djerba…"
+            placeholder="Éco-Lodge Djerba…"
           />
         </div>
       </div>

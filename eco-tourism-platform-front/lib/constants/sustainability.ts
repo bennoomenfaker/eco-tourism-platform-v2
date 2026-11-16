@@ -451,7 +451,7 @@ function levelFor(score: number, labels: [string, string, string, string, string
 
 export function getOfferSustainabilityLevel(score: number): SustainabilityLevel {
   return levelFor(score, [
-    "Offre Ambassadrice Adventures.tn",
+    "Offre Ambassadrice Sustainable Adventures",
     "Offre Éco-Responsable",
     "Offre Engagée",
     "Offre Sensibilisée",
@@ -461,7 +461,7 @@ export function getOfferSustainabilityLevel(score: number): SustainabilityLevel 
 
 export function getCircuitSustainabilityLevel(score: number): SustainabilityLevel {
   return levelFor(score, [
-    "Circuit Ambassadeur Adventures.tn",
+    "Circuit Ambassadeur Sustainable Adventures",
     "Circuit Éco-Responsable",
     "Circuit Engagé",
     "Circuit Sensibilisé",

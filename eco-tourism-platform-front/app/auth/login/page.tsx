@@ -3,11 +3,12 @@
 import Navbar from "@/components/home/Navbar";
 import Link from "next/link";
 import { Suspense, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { loginUser, resolvePostLoginRedirect } from "@/lib/auth";
 
 function LoginForm() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const redirectUrl = searchParams.get("redirect");
 
   const [email, setEmail] = useState("");
@@ -34,8 +35,9 @@ function LoginForm() {
         result.user.role,
         result.dashboard,
       );
-      // Hard navigation so role-based redirect always applies
-      window.location.assign(next);
+      // Navigation client : évite de retélécharger tout le bundle (login lent)
+      router.replace(next);
+      router.refresh();
     } catch (err: any) {
       setError(err.message || "Erreur lors de la connexion.");
     } finally {
@@ -214,7 +216,7 @@ function LoginForm() {
               </div>
 
               <p className="mt-10 text-center text-sm font-medium text-on-surface-variant">
-                Nouveau sur Adventures.tn ?
+                Nouveau sur Sustainable Adventures ?
                 <Link
                   href="/auth/register"
                   className="text-primary font-bold hover:underline ml-1"
@@ -231,7 +233,7 @@ function LoginForm() {
       <footer className="w-full py-8 mt-auto bg-transparent">
         <div className="flex flex-col md:flex-row justify-center items-center gap-6 px-8 font-manrope text-xs font-medium text-slate-500 dark:text-slate-400">
           <span className="text-slate-400">
-            © 2024 Adventures.tn. Tous droits réservés.
+            © 2024 Sustainable Adventures. Tous droits réservés.
           </span>
           <div className="flex gap-6">
             <Link href="#" className="hover:text-primary transition-colors cursor-pointer">

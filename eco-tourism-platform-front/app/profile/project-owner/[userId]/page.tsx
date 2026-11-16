@@ -118,7 +118,7 @@ const PROJECT_TYPE_LABELS: Record<string, string> = {
 };
 
 function getSustainabilityLevel(score: number) {
-  if (score >= 86) return { label: "Projet Ambassadeur Adventures.tn", color: "text-primary",     emoji: "⭐" };
+  if (score >= 86) return { label: "Projet Ambassadeur Sustainable Adventures", color: "text-primary",     emoji: "⭐" };
   if (score >= 71) return { label: "Projet Éco-Responsable",        color: "text-emerald-600", emoji: "🌿" };
   if (score >= 51) return { label: "Projet Engagé",                 color: "text-teal-600",    emoji: "🤝" };
   if (score >= 31) return { label: "Projet Sensibilisé",            color: "text-blue-600",    emoji: "💡" };
@@ -126,7 +126,7 @@ function getSustainabilityLevel(score: number) {
 }
 
 function getOfferSustainabilityLevel(score: number) {
-  if (score >= 86) return { label: "Offre Ambassadrice Adventures.tn", color: "text-primary",      emoji: "⭐" };
+  if (score >= 86) return { label: "Offre Ambassadrice Sustainable Adventures", color: "text-primary",      emoji: "⭐" };
   if (score >= 71) return { label: "Offre Éco-Responsable",         color: "text-emerald-600", emoji: "🌿" };
   if (score >= 51) return { label: "Offre Engagée",                 color: "text-teal-600",    emoji: "🤝" };
   if (score >= 31) return { label: "Offre Sensibilisée",            color: "text-blue-600",    emoji: "💡" };

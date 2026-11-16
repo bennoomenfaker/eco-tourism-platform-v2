@@ -67,7 +67,7 @@ const GUIDE_MESSAGES: Record<string, string> = {
   "Ambassadeur durable": "Félicitations ! Vous incarnez les meilleures pratiques du guidage éco-responsable.",
   "Écovoyageur engagé": "Excellent ! Vous êtes un guide très engagé dans le tourisme durable.",
   "Voyageur sensible": "Bien ! Vous avez une bonne sensibilité aux enjeux de l'écotourisme.",
-  "Voyageur classique": "La plateforme Adventures.tn vous accompagnera pour améliorer vos pratiques de guidage durable.",
+  "Voyageur classique": "La plateforme Sustainable Adventures vous accompagnera pour améliorer vos pratiques de guidage durable.",
 };
 
 function getScoreProfile(score: number): string {
@@ -127,7 +127,7 @@ function ScoreCard({ result }: { result: ScoreResult }) {
       <div className="w-full max-w-md p-5 bg-primary/10 rounded-2xl border border-primary/20 mb-8 text-left">
         <p className="text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
           <span className="material-symbols-outlined text-primary text-base">info</span>
-          La plateforme Adventures.tn utilisera vos réponses pour :
+          La plateforme Sustainable Adventures utilisera vos réponses pour :
         </p>
         <ul className="text-sm text-slate-600 space-y-1 font-medium">
           <li>• Mettre en valeur votre profil de guide éco-responsable</li>

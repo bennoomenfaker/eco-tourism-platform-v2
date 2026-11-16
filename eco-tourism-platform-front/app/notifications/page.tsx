@@ -34,7 +34,7 @@ function notifMeta(n: Notif) {
       body: `Votre profil professionnel n'a pas été validé par notre équipe`
         + `${n.data?.reason ? ` — **motif : ${n.data.reason}**` : ""}. `
         + `Votre compte sera désactivé **${disableAt ? `le ${disableAt}` : `sous ${n.data?.grace_hours ?? 24}h`}**. `
-        + `Contactez l'équipe Adventures.tn avant ce délai.`,
+        + `Contactez l'équipe Sustainable Adventures avant ce délai.`,
     },
     collaboration_invite: {
       icon: "handshake", accent: "bg-primary", iconBg: "bg-primary/10", iconColor: "text-primary",
@@ -382,7 +382,7 @@ export default function NotificationsPage() {
           <div className="flex items-center gap-2 shrink-0">
             <div className="flex items-center gap-1.5 text-slate-900 dark:text-white">
               <Leaf className="text-primary w-5 h-5" />
-              <span className="text-sm font-extrabold tracking-tight">Adventures.tn</span>
+              <span className="text-sm font-extrabold tracking-tight">Sustainable Adventures</span>
             </div>
           </div>
         </div>

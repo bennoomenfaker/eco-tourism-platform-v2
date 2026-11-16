@@ -1456,7 +1456,7 @@ function ProviderProfilePageContent({ embedded = false, forcedTab, openEditOnMou
   }, [router]);
 
   async function handleLogout() {
-    try { if (token) await logoutUser(token); } catch {}
+    if (token) logoutUser(token).catch(() => {});
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");
@@ -1985,7 +1985,7 @@ function ProviderProfilePageContent({ embedded = false, forcedTab, openEditOnMou
     if (status === "active") return false;
     alert(
       status === "rejected"
-        ? "Votre profil a été refusé. Contactez l'équipe Adventures.tn pour le régulariser."
+        ? "Votre profil a été refusé. Contactez l'équipe Sustainable Adventures pour le régulariser."
         : "Votre profil doit être validé par un administrateur avant de créer une offre ou un circuit. La validation intervient sous 48h.",
     );
     return true;
@@ -6195,7 +6195,7 @@ function ProviderProfilePageContent({ embedded = false, forcedTab, openEditOnMou
           </button>
           <div className="flex items-center gap-2 text-slate-900">
             <Leaf className="text-primary w-6 h-6" />
-            <span className="text-base font-extrabold tracking-tight">Adventures.tn</span>
+            <span className="text-base font-extrabold tracking-tight">Sustainable Adventures</span>
           </div>
         </div>
       </div>

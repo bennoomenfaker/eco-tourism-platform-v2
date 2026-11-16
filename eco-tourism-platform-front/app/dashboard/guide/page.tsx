@@ -155,7 +155,7 @@ function GuideDashboardContent() {
 
   async function handleLogout() {
     const token = localStorage.getItem("access_token") || "";
-    try { if (token) await logoutUser(token); } catch {}
+    if (token) logoutUser(token).catch(() => {});
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");
@@ -267,7 +267,7 @@ function GuideDashboardContent() {
           <div className="p-6 flex flex-col h-full">
             <div className="flex items-center gap-3 mb-10">
               <Leaf className="text-primary w-8 h-8" />
-              <h1 className="text-xl font-extrabold tracking-tight">Adventures.tn</h1>
+              <h1 className="text-xl font-extrabold tracking-tight">Sustainable Adventures</h1>
             </div>
 
             <nav className="flex-1 space-y-1">
@@ -515,7 +515,7 @@ function GuideDashboardContent() {
                 <div>
                   <p className="font-bold text-amber-800">Profil en attente de validation</p>
                   <p className="text-sm text-amber-600 font-medium">
-                    L&apos;équipe Adventures.tn va examiner votre profil sous 48h. Vous pourrez publier vos offres et vos circuits dès qu&apos;il sera validé.
+                    L&apos;équipe Sustainable Adventures va examiner votre profil sous 48h. Vous pourrez publier vos offres et vos circuits dès qu&apos;il sera validé.
                   </p>
                 </div>
               </div>
@@ -530,7 +530,7 @@ function GuideDashboardContent() {
                   <p className="text-sm text-red-600 font-medium">
                     {profile?.rejection_reason
                       ? profile.rejection_reason
-                      : "Contactez l'équipe Adventures.tn pour connaître le motif et régulariser votre profil."}
+                      : "Contactez l'équipe Sustainable Adventures pour connaître le motif et régulariser votre profil."}
                   </p>
                 </div>
               </div>

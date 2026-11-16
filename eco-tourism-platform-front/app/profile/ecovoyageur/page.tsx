@@ -341,7 +341,7 @@ function EcoTravelerProfilePageContent({ embedded = false, forcedTab, openEditOn
   }, [router]);
 
   async function handleLogout() {
-    try { if (token) await logoutUser(token); } catch {}
+    if (token) logoutUser(token).catch(() => {});
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");
@@ -397,7 +397,7 @@ function EcoTravelerProfilePageContent({ embedded = false, forcedTab, openEditOn
 
   const scoreLabel = (score: number | null) => {
     if (score === null) return "Éco-Voyageur";
-    if (score >= 80) return "Ambassadeur Adventures.tn";
+    if (score >= 80) return "Ambassadeur Sustainable Adventures";
     if (score >= 60) return "Explorateur Engagé";
     if (score >= 40) return "Voyageur Sensible";
     return "Voyageur Éco-Débutant";
@@ -927,7 +927,7 @@ function EcoTravelerProfilePageContent({ embedded = false, forcedTab, openEditOn
           </button>
           <div className="flex items-center gap-2 text-slate-900">
             <Leaf className="text-primary w-6 h-6" />
-            <span className="text-base font-extrabold tracking-tight">Adventures.tn</span>
+            <span className="text-base font-extrabold tracking-tight">Sustainable Adventures</span>
           </div>
         </div>
       </div>

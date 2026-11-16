@@ -157,7 +157,7 @@ function getScoreLabel(score: number | null, role: string): string {
     return "Guide en Développement";
   }
   if (role === "eco_traveler") {
-    if (score >= 80) return "Ambassadeur Adventures.tn";
+    if (score >= 80) return "Ambassadeur Sustainable Adventures";
     if (score >= 60) return "Voyageur Éco-Responsable";
     if (score >= 40) return "Voyageur Engagé";
     return "Voyageur Éco-Débutant";
@@ -586,6 +586,61 @@ function CircuitCard({ circuit, onClick }: { circuit: CircuitFeed; onClick: () =
   );
 }
 
+// ─── RecoCard (même format que Maram : petit carreau horizontal) ──────────────
+
+function RecoCard({ item, onOpen }: { item: RecommendedItem; onOpen: () => void }) {
+  const isOffer = item.type === "offer";
+  const data = item.data as any;
+  const image = isOffer
+    ? (data.images?.[0] ?? OFFER_PLACEHOLDERS[seedFromId(item.id, OFFER_PLACEHOLDERS.length)])
+    : (data.cover_image ?? OFFER_PLACEHOLDERS[seedFromId(item.id, OFFER_PLACEHOLDERS.length)]);
+  const authorName = data.org_name ?? data.author_name ?? null;
+  const authorPhoto = data.org_logo ?? data.author_photo ?? null;
+
+  return (
+    <div
+      className="w-56 shrink-0 flex flex-col rounded-2xl overflow-hidden bg-white border border-slate-100 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 cursor-pointer group"
+      onClick={onOpen}
+    >
+      <div className="relative h-36 overflow-hidden">
+        <div className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500" style={{ backgroundImage: `url('${image}')` }} />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+        <div className="absolute top-2 left-2 flex gap-1.5">
+          <span className="bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded-full text-[10px] font-extrabold text-slate-700 uppercase tracking-wider shadow-sm">
+            {isOffer ? "Offre" : "Circuit"}
+          </span>
+        </div>
+        <div className="absolute bottom-2 left-2">
+          {(item.likesCount ?? 0) > 0 ? (
+            <span className="flex items-center gap-1 bg-white/90 backdrop-blur-sm text-slate-700 px-2 py-0.5 rounded-full text-[10px] font-extrabold shadow-sm">
+              ❤️ {item.likesCount} j&apos;aime
+            </span>
+          ) : null}
+        </div>
+      </div>
+      <div className="p-3 flex flex-col flex-1">
+        <h4 className="font-extrabold text-slate-900 text-sm line-clamp-2 group-hover:text-primary transition-colors mb-2">{data.title}</h4>
+        <SustainabilityBadge score={data.sustainability_score} kind={isOffer ? "offer" : "circuit"} className="mb-2 self-start" />
+        {authorName && (
+          <div className="flex items-center gap-1.5 mb-2">
+            {authorPhoto
+              ? <img src={authorPhoto} alt="" className="w-5 h-5 rounded-full object-cover border border-slate-100 shrink-0" />
+              : <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-primary font-black text-[8px] shrink-0">{authorName[0]?.toUpperCase()}</div>
+            }
+            <span className="text-[11px] font-semibold text-slate-500 truncate">{authorName}</span>
+          </div>
+        )}
+        <button
+          className="mt-auto w-full py-1.5 rounded-lg bg-primary/10 text-primary font-bold text-xs hover:bg-primary/20 transition-colors"
+          onClick={(e) => { e.stopPropagation(); onOpen(); }}
+        >
+          Voir
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ─── PublicationCard ──────────────────────────────────────────────────────────
 
 function PublicationCard({
@@ -872,7 +927,7 @@ function ExplorerContent() {
 
   /* ── Logout ── */
   async function handleLogout() {
-    try { if (token) await logoutUser(token); } catch {}
+    if (token) logoutUser(token).catch(() => {});
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");
@@ -940,10 +995,10 @@ function ExplorerContent() {
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
-  // Les recommandations sont montrées par nature, avec les mêmes cartes que
-  // /destinations (offres) et la section Circuits : deux blocs lisibles plutôt
-  // qu'une rangée horizontale de vignettes. Le catalogue public complète chaque
-  // bloc quand les recommandations ne contiennent qu'un seul type.
+  // Comme chez Maram, la première ligne d'offres est une rangée horizontale de
+  // petits carreaux : mêmes recommandations, mais une seule ligne scrollable.
+  // Le catalogue public complète la liste quand le classement par likes ne
+  // retient qu'un seul type.
   const recOfferData   = recommendations.filter((r) => r.type === "offer").map((r) => r.data as OfferFeed);
   const recCircuitData = recommendations.filter((r) => r.type === "circuit").map((r) => r.data as CircuitFeed);
 
@@ -971,6 +1026,33 @@ function ExplorerContent() {
     ? exploreCircuits.filter((c) => correspond([c.title, c.description]))
     : exploreCircuits;
 
+  // Une seule rangée, offres puis circuits : les métadonnées de recommandation
+  // (likes) sont récupérées par identifiant, les éléments du catalogue public
+  // complètent la suite sans doublon.
+  const recoMeta = new Map(recommendations.map((r) => [r.id, r]));
+  const recoRow: RecommendedItem[] = [
+    ...offresAffichees.map(
+      (o) =>
+        recoMeta.get(o.id) ?? {
+          type: "offer" as const,
+          id: o.id,
+          created_at: o.created_at,
+          matchScore: 0,
+          data: o,
+        },
+    ),
+    ...circuitsAffiches.map(
+      (c) =>
+        recoMeta.get(c.id) ?? {
+          type: "circuit" as const,
+          id: c.id,
+          created_at: c.created_at,
+          matchScore: 0,
+          data: c,
+        },
+    ),
+  ];
+
   function asFeedItem(item: OfferFeed | CircuitFeed, type: "offer" | "circuit"): FeedItem {
     return { type, id: item.id, created_at: item.created_at, data: item } as FeedItem;
   }
@@ -989,7 +1071,7 @@ function ExplorerContent() {
           <div className="p-6 flex flex-col h-full">
             <div className="-mt-2 mb-6 flex items-center gap-3">
               <Leaf className="text-primary w-8 h-8" />
-              <h1 className="text-xl font-extrabold tracking-tight">Adventures.tn</h1>
+              <h1 className="text-xl font-extrabold tracking-tight whitespace-nowrap">Sustainable Adventures</h1>
             </div>
 
             <nav className="flex-1 space-y-1">
@@ -1274,8 +1356,8 @@ function ExplorerContent() {
                 </div>
               )}
 
-            {/* ── Pour vous / À découvrir (recommendations) ── */}
-            {(recoLoading || offresAffichees.length > 0 || circuitsAffiches.length > 0) && (
+            {/* ── Pour vous / À découvrir : petits carreaux horizontaux (style Maram) ── */}
+            {(recoLoading || recoRow.length > 0) && (
               <div className="mb-8">
                 <div className="flex items-center gap-2 mb-4">
                   <Sparkles className="w-4 h-4 text-primary" />
@@ -1292,58 +1374,14 @@ function ExplorerContent() {
                     <span className="text-xs text-slate-400">Chargement des recommandations…</span>
                   </div>
                 ) : (
-                  <div className="space-y-8">
-                    {offresAffichees.length > 0 && (
-                      <section>
-                        <div className="mb-3 flex items-center gap-2">
-                          <span className="material-symbols-outlined text-lg text-primary">storefront</span>
-                          <h4 className="text-xs font-extrabold uppercase tracking-widest text-slate-500">Offres</h4>
-                          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500 dark:bg-slate-800">
-                            {offresAffichees.length}
-                          </span>
-                        </div>
-                        {/* Carrousel horizontal : les 6 offres restent sur une
-                            seule ligne, chaque carte prend toute la largeur sur
-                            mobile et une largeur fixe sur bureau. */}
-                        <div
-                          className="-mx-1 flex snap-x snap-mandatory gap-4 overflow-x-auto px-1 pb-2"
-                          style={{ scrollbarWidth: "none" }}
-                        >
-                          {offresAffichees.map((offer) => (
-                            <div
-                              key={offer.id}
-                              className="w-full shrink-0 snap-start sm:w-[320px]"
-                            >
-                              <OfferCard
-                                offer={offer}
-                                onClick={() => openDetail(asFeedItem(offer, "offer"))}
-                              />
-                            </div>
-                          ))}
-                        </div>
-                      </section>
-                    )}
-
-                    {circuitsAffiches.length > 0 && (
-                      <section>
-                        <div className="mb-3 flex items-center gap-2">
-                          <span className="material-symbols-outlined text-lg text-primary">route</span>
-                          <h4 className="text-xs font-extrabold uppercase tracking-widest text-slate-500">Circuits</h4>
-                          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500 dark:bg-slate-800">
-                            {circuitsAffiches.length}
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                          {circuitsAffiches.map((circuit) => (
-                            <CircuitCard
-                              key={circuit.id}
-                              circuit={circuit}
-                              onClick={() => openDetail(asFeedItem(circuit, "circuit"))}
-                            />
-                          ))}
-                        </div>
-                      </section>
-                    )}
+                  <div className="flex gap-4 overflow-x-auto pb-2" style={{ scrollbarWidth: "none" }}>
+                    {recoRow.map((item) => (
+                      <RecoCard
+                        key={`${item.type}-${item.id}`}
+                        item={item}
+                        onOpen={() => openDetail(asFeedItem(item.data, item.type))}
+                      />
+                    ))}
                   </div>
                 )}
               </div>

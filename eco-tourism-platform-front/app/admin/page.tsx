@@ -237,7 +237,7 @@ function DetailImages({ images }: { images: string[] | null }) {
 function DetailSustainability({ score }: { score: number | null }) {
   if (score === null) return null;
   const level =
-    score >= 86 ? { label: "Ambassadeur Adventures.tn", color: "text-primary",      bar: "bg-primary" } :
+    score >= 86 ? { label: "Ambassadeur Sustainable Adventures", color: "text-primary",      bar: "bg-primary" } :
     score >= 71 ? { label: "Éco-Responsable",        color: "text-emerald-600", bar: "bg-emerald-500" } :
     score >= 51 ? { label: "Engagé",                 color: "text-teal-600",    bar: "bg-teal-500" } :
     score >= 31 ? { label: "Sensibilisé",            color: "text-blue-600",    bar: "bg-blue-500" } :

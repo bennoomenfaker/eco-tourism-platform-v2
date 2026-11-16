@@ -7,7 +7,7 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Adventures.tn",
+  title: "Sustainable Adventures",
   description: "Page de connexion",
 };
 

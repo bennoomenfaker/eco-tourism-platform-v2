@@ -541,7 +541,7 @@ export default function OnboardingPage() {
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Leaf className="text-primary w-7 h-7" />
-            <span className="text-lg font-extrabold tracking-tight">Adventures.tn</span>
+            <span className="text-lg font-extrabold tracking-tight">Sustainable Adventures</span>
           </div>
           <span className="text-sm font-semibold text-slate-500">Étape {step} sur {STEPS.length}</span>
         </div>

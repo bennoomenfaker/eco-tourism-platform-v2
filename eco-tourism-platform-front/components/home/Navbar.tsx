@@ -75,7 +75,7 @@ export default function Navbar({
             onClick={() => setMenuOuvert(false)}
           >
             <Leaf className="text-primary w-8 h-8 shrink-0" />
-            <h2 className="text-xl font-extrabold tracking-tight">Adventures.tn</h2>
+            <h2 className="text-xl font-extrabold tracking-tight">Sustainable Adventures</h2>
           </Link>
         </div>
 
