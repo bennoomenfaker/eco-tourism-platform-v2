@@ -6906,7 +6906,7 @@ function ProviderProfilePageContent({ embedded = false, forcedTab, openEditOnMou
                       <select value={offerLangue} onChange={(e) => setOfferLangue(e.target.value)}
                         className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white">
                         <option value="">— Sélectionner —</option>
-                        {langs.map((l) => <option key={l} value={l}>{l}</option>)}
+                        {langs.map((l, i) => <option key={`${l}-${i}`} value={l}>{l}</option>)}
                       </select>
                     </div>
                   );
@@ -9102,7 +9102,7 @@ function ProviderProfilePageContent({ embedded = false, forcedTab, openEditOnMou
                                     <div className="flex flex-wrap gap-2 mt-3">
                                       <span className="flex items-center gap-1 text-[10px] font-black tracking-widest uppercase text-primary bg-primary/10 px-2.5 py-1 rounded-xl"><Calendar size={10} />{circuit.nb_jours} jour{circuit.nb_jours > 1 ? "s" : ""}</span>
                                       <span className="flex items-center gap-1 text-[10px] font-black tracking-widest uppercase text-slate-500 bg-slate-100 px-2.5 py-1 rounded-xl"><MapPin size={10} />{circuit.etapes.length} étape{circuit.etapes.length > 1 ? "s" : ""}</span>
-                                      {catLabels.slice(0, 3).map((l) => (<span key={l} className="text-[10px] font-bold text-slate-500 bg-slate-50 border border-slate-100 px-2 py-1 rounded-xl">{l}</span>))}
+                                      {catLabels.slice(0, 3).map((l, i) => (<span key={`${l}-${i}`} className="text-[10px] font-bold text-slate-500 bg-slate-50 border border-slate-100 px-2 py-1 rounded-xl">{l}</span>))}
                                     </div>
                                     {circuit.sustainability_score !== null && circuit.sustainability_score !== undefined ? (
                                       (() => {
@@ -9528,8 +9528,8 @@ function ProviderProfilePageContent({ embedded = false, forcedTab, openEditOnMou
                                 <span className="flex items-center gap-1 text-[10px] font-black tracking-widest uppercase text-slate-500 bg-slate-100 px-2.5 py-1 rounded-xl">
                                   <MapPin size={10} />{circuit.etapes.length} étape{circuit.etapes.length > 1 ? "s" : ""}
                                 </span>
-                                {catLabels.slice(0, 3).map((l) => (
-                                  <span key={l} className="text-[10px] font-bold text-slate-500 bg-slate-50 border border-slate-100 px-2 py-1 rounded-xl">{l}</span>
+                                {catLabels.slice(0, 3).map((l, i) => (
+                                  <span key={`${l}-${i}`} className="text-[10px] font-bold text-slate-500 bg-slate-50 border border-slate-100 px-2 py-1 rounded-xl">{l}</span>
                                 ))}
                               </div>
                               {circuit.sustainability_score !== null && circuit.sustainability_score !== undefined ? (
@@ -9894,8 +9894,8 @@ function ProviderProfilePageContent({ embedded = false, forcedTab, openEditOnMou
                             {(profile.languages_spoken?.length
                               ? profile.languages_spoken
                               : profile.language ? [profile.language] : []
-                            ).map((l) => (
-                              <span key={l} className="bg-primary/10 text-primary text-[11px] font-bold px-2.5 py-1 rounded-full">
+                            ).map((l, i) => (
+                              <span key={`${l}-${i}`} className="bg-primary/10 text-primary text-[11px] font-bold px-2.5 py-1 rounded-full">
                                 {{ fr: "Français", ar: "Arabe", en: "Anglais", es: "Espagnol", de: "Allemand", it: "Italien", ber: "Amazigh" }[l] ?? l}
                               </span>
                             ))}

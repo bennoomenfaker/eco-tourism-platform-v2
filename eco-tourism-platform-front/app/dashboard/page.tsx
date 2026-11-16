@@ -24,7 +24,6 @@ import ProjectOwnerProfilePage from "@/app/profile/project-owner/page";
 import BadgeChip from "@/components/common/BadgeChip";
 import { useMesReservations, MesReservationsPanel } from "@/components/reservation/DashboardReservations";
 import ScoreBadgeCard from "@/components/common/ScoreBadgeCard";
-import DetailCompletion from "@/components/common/DetailCompletion";
 
 const MapPicker = dynamic(
   () => import("@/components/map/MapPicker"),
@@ -1621,16 +1620,16 @@ function DashboardContent() {
 
         {/* ── Sidebar ─────────────────────────────────────────────────────── */}
         <DashboardSidebar>
-          <div className="p-4 flex flex-col h-full">
+          <div className="p-6 flex flex-col h-full">
             <div className="flex items-center gap-3 mb-5">
               <Leaf className="text-primary w-8 h-8" />
               <h1 className="text-xl font-extrabold tracking-tight">Sustainable Adventures</h1>
             </div>
 
-            <nav className="flex-1 min-h-0 space-y-0.5 overflow-y-auto">
+            <nav className="flex-1 space-y-1">
               {navItems.map((item) => (
                 <button key={item.label} onClick={() => { closeNav(); item.action(); }}
-                  className={`w-full flex items-center gap-3 px-4 py-2 rounded-xl transition-all ${
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                     activeItem === item.label || (item.label === "Offres" && activeItem === "Offres")
                       ? "bg-primary/10 text-primary font-bold"
                       : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
@@ -1640,7 +1639,7 @@ function DashboardContent() {
                 </button>
               ))}
               <button onClick={() => { closeNav(); router.push("/messagerie"); }}
-                className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
                 <span className="material-symbols-outlined">chat</span>
                 <span>Messagerie</span>
                 {dashConvos.reduce((s, c) => s + c.unread_count, 0) > 0 && (
@@ -1650,13 +1649,13 @@ function DashboardContent() {
                 )}
               </button>
               <button onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
                 <span className="material-symbols-outlined">logout</span>
                 <span>Déconnexion</span>
               </button>
             </nav>
 
-            <div className="mt-auto pt-3 border-t border-slate-100 dark:border-slate-800">
+            <div className="mt-auto pt-6 border-t border-slate-100 dark:border-slate-800">
               <div className="flex justify-between items-center mb-2">
                 <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Profil complété</p>
                 <p className="text-xs font-extrabold text-primary">{profile.profile_completion}%</p>
@@ -1666,13 +1665,6 @@ function DashboardContent() {
               </div>
             </div>
 
-            {/* Le grand bouton menait au questionnaire quel que soit son
-                libellé. Il ouvre maintenant ce que la jauge juste au-dessus
-                laisse deviner : ce qui manque au profil. */}
-            <DetailCompletion
-              lignes={(profile as any)?.completion_details ?? []}
-              total={profile?.profile_completion ?? 0}
-            />
           </div>
         </DashboardSidebar>
 
