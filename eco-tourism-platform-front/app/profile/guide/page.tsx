@@ -3417,24 +3417,29 @@ function GuideProfilePageContent({ embedded = false, forcedTab, openEditOnMount 
                     </button>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 gap-4">
+                  <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
                     {guideCircuits.map((circuit) => {
                       const cStatus = circuit.status ?? "draft";
                       const cStatusLabel = cStatus === "approved" ? "Publié" : cStatus === "attente_publication" ? "Prêt à publier" : "Brouillon";
                       const cStatusCls   = cStatus === "approved" ? "bg-emerald-500 text-white" : cStatus === "attente_publication" ? "bg-teal-500 text-white" : "bg-slate-400 text-white";
                       const etapes: any[] = circuit.etapes ?? [];
+                      const cover = circuit.cover_image ?? (circuit as any).images?.[0] ?? null;
+                      const prixDepart = (circuit as any).price ?? etapes.map((e: any) => e.prix).filter((v: any) => typeof v === "number" && v > 0).sort((x: number, y: number) => x - y)[0] ?? null;
                       return (
-                        <div key={circuit.id} className="bg-white rounded-3xl border border-slate-100/80 shadow-sm overflow-hidden hover:shadow-md transition-all">
-                          <div className="flex gap-0">
+                        <div key={circuit.id} className="group flex h-full flex-col overflow-hidden rounded-3xl border border-slate-100/80 bg-white shadow-sm transition-all hover:shadow-lg">
+                          <div className="flex flex-1 flex-col">
                             {/* Cover */}
-                            <div className="relative w-40 shrink-0 bg-gradient-to-br from-primary/20 to-emerald-100 flex items-center justify-center">
-                              {circuit.cover_image
-                                ? <img src={circuit.cover_image} alt="" className="w-full h-full object-cover absolute inset-0" />
+                            <div className="relative flex aspect-[16/9] w-full shrink-0 items-center justify-center overflow-hidden bg-gradient-to-br from-primary/20 to-emerald-100">
+                              {cover
+                                ? <img src={cover} alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
                                 : <Route size={32} className="text-primary/40" />}
-                              <span className={`absolute top-2 left-2 text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded-lg ${cStatusCls}`}>{cStatusLabel}</span>
+                              {prixDepart !== null && (
+                                <span className="absolute bottom-3 right-3 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-extrabold text-slate-800 shadow-sm">dès {prixDepart} DT</span>
+                              )}
+                              <span className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-widest shadow-sm ${cStatusCls}`}>{cStatusLabel}</span>
                             </div>
                             {/* Info */}
-                            <div className="flex-1 p-5">
+                            <div className="flex flex-1 flex-col p-5">
                               <div className="flex items-start justify-between gap-3">
                                 <div className="flex-1 min-w-0">
                                   <h4 className="text-base font-extrabold text-slate-800 leading-tight">{circuit.title}</h4>
@@ -3494,8 +3499,8 @@ function GuideProfilePageContent({ embedded = false, forcedTab, openEditOnMount 
                                     </button>
                                   )}
                               {/* Étapes preview */}
-                              <div className="mt-3 space-y-1">
-                                {etapes.slice(0, 3).map((etape: any) => {
+                              <div className="mt-3 space-y-1.5">
+                                {etapes.slice(0, 3).map((etape: any, i: number) => {
                                   const eCat = PROVIDER_SCHEMA.find((c) => c.value === etape.categorie);
                                   const catLabel = eCat?.label
                                     ?? DOMAINES_META[etape.categorie]?.label
@@ -3507,7 +3512,7 @@ function GuideProfilePageContent({ embedded = false, forcedTab, openEditOnMount 
                                   const expertiseLabels = ((etape.fields as any)?.expertises as string[] | undefined ?? []).slice(0, 2);
                                   const secondaryLabel = stLabels.length > 0 ? stLabels.join(", ") : expertiseLabels.join(", ");
                                   return (
-                                    <div key={etape.id} className="flex items-center gap-2 text-xs">
+                                    <div key={`${etape.jour}-${i}`} className="flex items-center gap-2 text-xs">
                                       <span className="w-5 h-5 rounded-full bg-primary/10 text-primary font-black flex items-center justify-center text-[10px] shrink-0">{etape.jour}</span>
                                       <span className="font-semibold text-slate-700 truncate">{displayName}</span>
                                       {secondaryLabel && (
@@ -3536,7 +3541,7 @@ function GuideProfilePageContent({ embedded = false, forcedTab, openEditOnMount 
                                     if (enriched) setGuideViewingCircuit(enriched);
                                   } catch {}
                                 }}
-                                className="mt-3 flex items-center gap-1.5 text-[11px] font-extrabold text-primary hover:text-primary/80 transition-colors cursor-pointer"
+                                className="mt-auto flex items-center gap-1.5 pt-4 text-[11px] font-extrabold text-primary transition-colors hover:text-primary/80 cursor-pointer"
                               >
                                 <Info size={12} />Voir les détails
                               </button>
